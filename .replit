@@ -30,3 +30,8 @@ externalPort = 8081
 [[ports]]
 localPort = 18374
 externalPort = 80
+
+[userenv]
+
+[userenv.shared]
+SAFE_HAVEN_BASE_URL = "https://api.sandbox.safehavenmfb.com"
