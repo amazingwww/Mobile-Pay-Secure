@@ -73,8 +73,12 @@ export default function ProfileScreen() {
         {
           icon: 'shield',
           label: 'Verification',
-          sub: user?.tier,
-          onPress: () => Alert.alert('Verification', 'Your account is ' + user?.tier + ' verified.'),
+          sub: user?.tier === 'Tier 2' ? 'Verified ✓' : 'Upgrade to Tier 2',
+          color: user?.tier === 'Tier 2' ? '#16A34A' : undefined,
+          onPress: () =>
+            user?.tier === 'Tier 2'
+              ? Alert.alert('Verified', 'Your account is fully verified (Tier 2).')
+              : router.push('/kyc'),
         },
       ],
     },
@@ -171,7 +175,7 @@ export default function ProfileScreen() {
                         {item.label}
                       </Text>
                       {item.sub && (
-                        <Text style={[styles.menuSub, { color: colors.mutedForeground }]}>{item.sub}</Text>
+                        <Text style={[styles.menuSub, { color: item.color ?? colors.mutedForeground }]}>{item.sub}</Text>
                       )}
                     </View>
                     <Feather name="chevron-right" size={18} color={colors.mutedForeground} />

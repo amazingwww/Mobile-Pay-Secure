@@ -32,7 +32,7 @@ const DEFAULT_USER: User = {
   email: 'adebayo@zela.ng',
   bvn: '22*******12',
   pin: '1234',
-  tier: 'Tier 2',
+  tier: 'Tier 1',
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
