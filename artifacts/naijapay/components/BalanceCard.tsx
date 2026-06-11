@@ -29,7 +29,7 @@ export function BalanceCard({ balance, accountNumber, accountName, bankName }: P
       <View style={styles.topRow}>
         <View style={styles.logoRow}>
           <View style={styles.logoCircle}>
-            <Text style={styles.logoLetter}>N</Text>
+            <Text style={styles.logoLetter}>Z</Text>
           </View>
           <Text style={styles.bankName}>{bankName}</Text>
         </View>

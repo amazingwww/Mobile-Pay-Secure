@@ -70,9 +70,9 @@ export default function LoginScreen() {
     <View style={[styles.root, { backgroundColor: colors.background, paddingTop: topPad, paddingBottom: bottomPad + 16 }]}>
       <View style={styles.logoSection}>
         <View style={[styles.logoCircle, { backgroundColor: colors.primary }]}>
-          <Text style={styles.logoLetter}>N</Text>
+          <Text style={styles.logoLetter}>Z</Text>
         </View>
-        <Text style={[styles.appName, { color: colors.foreground }]}>NaijaPay</Text>
+        <Text style={[styles.appName, { color: colors.foreground }]}>Zela</Text>
         <Text style={[styles.tagline, { color: colors.mutedForeground }]}>Microfinance Bank</Text>
       </View>
 

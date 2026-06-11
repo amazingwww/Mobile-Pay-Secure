@@ -39,7 +39,7 @@ export default function ProfileScreen() {
   const handleLogout = () => {
     Alert.alert(
       'Log Out',
-      'Are you sure you want to log out of NaijaPay?',
+      'Are you sure you want to log out of Zela?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -101,7 +101,7 @@ export default function ProfileScreen() {
         {
           icon: 'help-circle',
           label: 'Help Center',
-          onPress: () => Alert.alert('Help Center', 'For support, call 0800-NAIJAPAY or email support@naijapay.ng'),
+          onPress: () => Alert.alert('Help Center', 'For support, call 0800-ZELA or email support@zela.ng'),
         },
         {
           icon: 'message-square',
@@ -201,7 +201,7 @@ export default function ProfileScreen() {
         </View>
 
         <Text style={[styles.version, { color: colors.mutedForeground }]}>
-          NaijaPay v1.0.0 {'\u2022'} CBN Licensed
+          Zela v1.0.0 {'\u2022'} CBN Licensed
         </Text>
       </ScrollView>
     </View>

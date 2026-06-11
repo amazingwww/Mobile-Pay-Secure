@@ -20,15 +20,16 @@ type AuthContextType = {
   login: (pin: string) => Promise<boolean>;
   logout: () => void;
   updatePin: (oldPin: string, newPin: string) => Promise<boolean>;
+  updateUser: (updates: Partial<User>) => Promise<void>;
 };
 
 const DEFAULT_USER: User = {
   name: 'Adebayo Okonkwo',
   accountNumber: '0123456789',
   accountName: 'ADEBAYO OKONKWO',
-  bankName: 'NaijaPay Microfinance Bank',
+  bankName: 'Zela Microfinance Bank',
   phone: '+234 801 234 5678',
-  email: 'adebayo@naijapay.ng',
+  email: 'adebayo@zela.ng',
   bvn: '22*******12',
   pin: '1234',
   tier: 'Tier 2',
@@ -47,11 +48,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const initUser = async () => {
     try {
-      const stored = await AsyncStorage.getItem('@naijapay_user');
+      const stored = await AsyncStorage.getItem('@zela_user');
       if (stored) {
         setUser(JSON.parse(stored));
       } else {
-        await AsyncStorage.setItem('@naijapay_user', JSON.stringify(DEFAULT_USER));
+        await AsyncStorage.setItem('@zela_user', JSON.stringify(DEFAULT_USER));
         setUser(DEFAULT_USER);
       }
     } catch {
@@ -75,13 +76,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updatePin = async (oldPin: string, newPin: string): Promise<boolean> => {
     if (!user || oldPin !== user.pin) return false;
     const updated = { ...user, pin: newPin };
-    await AsyncStorage.setItem('@naijapay_user', JSON.stringify(updated));
+    await AsyncStorage.setItem('@zela_user', JSON.stringify(updated));
     setUser(updated);
     return true;
   };
 
+  const updateUser = async (updates: Partial<User>) => {
+    if (!user) return;
+    const updated = { ...user, ...updates };
+    await AsyncStorage.setItem('@zela_user', JSON.stringify(updated));
+    setUser(updated);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout, updatePin }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout, updatePin, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

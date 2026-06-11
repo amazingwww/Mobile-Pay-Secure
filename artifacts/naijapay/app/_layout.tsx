@@ -10,7 +10,6 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -27,22 +26,10 @@ function RootLayoutNav() {
       <Stack.Screen name="index" />
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen
-        name="airtime"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="data"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="receive"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="bill-payment"
-        options={{ headerShown: false }}
-      />
+      <Stack.Screen name="airtime" options={{ headerShown: false }} />
+      <Stack.Screen name="data" options={{ headerShown: false }} />
+      <Stack.Screen name="receive" options={{ headerShown: false }} />
+      <Stack.Screen name="bill-payment" options={{ headerShown: false }} />
     </Stack>
   );
 }
@@ -69,10 +56,8 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <WalletProvider>
-              <GestureHandlerRootView>
-                <KeyboardProvider>
-                  <RootLayoutNav />
-                </KeyboardProvider>
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <RootLayoutNav />
               </GestureHandlerRootView>
             </WalletProvider>
           </AuthProvider>
