@@ -1,0 +1,27 @@
+kind = "mobile"
+previewPath = "/"
+title = "NaijaPay"
+version = "1.0.0"
+id = "artifacts/naijapay"
+router = "expo-domain"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+ensurePreviewReachable = "/status"
+name = "expo"
+paths = [ "/" ]
+localPort = 18374
+
+[services.development]
+run = "pnpm --filter @workspace/naijapay run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/naijapay", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/naijapay", "run", "serve" ]
+
+[services.env]
+PORT = "18374"
+BASE_PATH = "/"

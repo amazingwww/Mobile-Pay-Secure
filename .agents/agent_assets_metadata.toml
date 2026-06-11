@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "jo7gUReWDetd8QIzDU95b"
+uri = "file://artifacts/naijapay/assets/images/icon.png"
+type = "image"
+title = "naijapay app icon"
