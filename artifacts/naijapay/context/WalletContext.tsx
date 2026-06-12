@@ -51,6 +51,8 @@ type WalletContextType = {
   payBill: (type: string, reference: string, amount: number, extra?: Record<string, string>) => Promise<{ ok: boolean; token?: string; error?: string }>;
   addBeneficiary: (b: Omit<Beneficiary, 'id'>) => void;
   verifyAccount: (accountNumber: string, bankCode: string) => Promise<string>;
+  fundGoalTransfer: (amount: number, goalName: string) => Promise<{ ok: boolean; error?: string }>;
+  creditBalance: (amount: number, goalName: string) => void;
 };
 
 function genId() {
@@ -257,8 +259,34 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     saveBeneficiaries(updated);
   };
 
+  const fundGoalTransfer = async (amount: number, goalName: string): Promise<{ ok: boolean; error?: string }> => {
+    if (amount > balance) return { ok: false, error: 'Insufficient balance' };
+    setBalance(b => b - amount);
+    addTx({
+      id: genId(), type: 'debit', amount,
+      description: `Savings: ${goalName}`,
+      party: 'Zela Savings',
+      date: new Date().toISOString(),
+      status: 'success', category: 'transfer',
+      reference: 'ZL' + genId().toUpperCase(),
+    });
+    return { ok: true };
+  };
+
+  const creditBalance = (amount: number, goalName: string) => {
+    setBalance(b => b + amount);
+    addTx({
+      id: genId(), type: 'credit', amount,
+      description: `Withdrawal: ${goalName}`,
+      party: 'Zela Savings',
+      date: new Date().toISOString(),
+      status: 'success', category: 'deposit',
+      reference: 'ZL' + genId().toUpperCase(),
+    });
+  };
+
   return (
-    <WalletContext.Provider value={{ balance, transactions, beneficiaries, isLoading, isTxLoading, apiReady, refresh, sendMoney, buyAirtime, buyData, payBill, addBeneficiary, verifyAccount }}>
+    <WalletContext.Provider value={{ balance, transactions, beneficiaries, isLoading, isTxLoading, apiReady, refresh, sendMoney, buyAirtime, buyData, payBill, addBeneficiary, verifyAccount, fundGoalTransfer, creditBalance }}>
       {children}
     </WalletContext.Provider>
   );

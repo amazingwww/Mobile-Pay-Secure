@@ -2,7 +2,6 @@ import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import {
-  FlatList,
   Platform,
   ScrollView,
   StyleSheet,
@@ -13,8 +12,10 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BalanceCard } from '@/components/BalanceCard';
 import { QuickAction } from '@/components/QuickAction';
+import { SavingsGoalCard } from '@/components/SavingsGoalCard';
 import { TransactionItem } from '@/components/TransactionItem';
 import { useAuth } from '@/context/AuthContext';
+import { useSavings } from '@/context/SavingsContext';
 import { useWallet } from '@/context/WalletContext';
 import { useColors } from '@/hooks/useColors';
 
@@ -30,6 +31,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { balance, transactions } = useWallet();
+  const { goals, totalSaved } = useSavings();
 
   const topPad = Platform.OS === 'web' ? 67 : insets.top;
   const firstName = user?.name?.split(' ')[0] ?? '';
@@ -113,6 +115,47 @@ export default function HomeScreen() {
         </View>
         <Feather name="gift" size={32} color="rgba(255,255,255,0.4)" />
       </View>
+
+      {/* Savings Goals */}
+      {goals.length > 0 && (
+        <View style={styles.savingsSection}>
+          <View style={styles.txHeader}>
+            <View>
+              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Savings Goals</Text>
+              <Text style={[styles.savingsSub, { color: colors.mutedForeground }]}>
+                ₦{totalSaved.toLocaleString('en-NG', { minimumFractionDigits: 2 })} saved total
+              </Text>
+            </View>
+            <TouchableOpacity onPress={() => router.push('/savings')}>
+              <Text style={[styles.seeAll, { color: colors.primary }]}>See all</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingRight: 16 }}
+          >
+            {goals.slice(0, 5).map(goal => (
+              <SavingsGoalCard
+                key={goal.id}
+                goal={goal}
+                compact
+                onPress={() => router.push('/savings')}
+              />
+            ))}
+            <TouchableOpacity
+              style={[styles.newGoalChip, { backgroundColor: colors.card, borderColor: colors.border }]}
+              onPress={() => router.push('/savings')}
+              activeOpacity={0.75}
+            >
+              <View style={[styles.newGoalPlus, { backgroundColor: colors.primary + '18' }]}>
+                <Feather name="plus" size={20} color={colors.primary} />
+              </View>
+              <Text style={[styles.newGoalText, { color: colors.mutedForeground }]}>New{'\n'}Goal</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+      )}
 
       {/* Recent Transactions */}
       <View style={styles.txSection}>
@@ -222,6 +265,37 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_400Regular',
     fontSize: 12,
     color: 'rgba(255,255,255,0.8)',
+  },
+  savingsSection: {
+    paddingHorizontal: 16,
+    marginBottom: 24,
+  },
+  savingsSub: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
+    marginTop: 1,
+  },
+  newGoalChip: {
+    width: 90,
+    borderRadius: 16,
+    padding: 14,
+    gap: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+  },
+  newGoalPlus: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  newGoalText: {
+    fontFamily: 'Inter_500Medium',
+    fontSize: 12,
+    textAlign: 'center',
   },
   txSection: {
     paddingHorizontal: 16,

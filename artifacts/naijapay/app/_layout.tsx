@@ -14,6 +14,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/context/AuthContext";
+import { SavingsProvider } from "@/context/SavingsContext";
 import { WalletProvider } from "@/context/WalletContext";
 import { setupNotificationChannel } from "@/lib/notifications";
 
@@ -33,6 +34,7 @@ function RootLayoutNav() {
       <Stack.Screen name="bill-payment" options={{ headerShown: false }} />
       <Stack.Screen name="kyc" options={{ headerShown: false }} />
       <Stack.Screen name="receipt" options={{ headerShown: false }} />
+      <Stack.Screen name="savings" options={{ headerShown: false }} />
     </Stack>
   );
 }
@@ -63,9 +65,11 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <WalletProvider>
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <RootLayoutNav />
-              </GestureHandlerRootView>
+              <SavingsProvider>
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                  <RootLayoutNav />
+                </GestureHandlerRootView>
+              </SavingsProvider>
             </WalletProvider>
           </AuthProvider>
         </QueryClientProvider>
