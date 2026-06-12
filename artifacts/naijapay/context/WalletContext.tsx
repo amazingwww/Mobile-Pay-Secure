@@ -1,6 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { api, type ApiTransaction } from '@/lib/api';
+import {
+  notifyTransferSent,
+  notifyAirtimeSent,
+  notifyDataPurchased,
+  notifyBillPaid,
+} from '@/lib/notifications';
 
 export type TxCategory = 'transfer' | 'airtime' | 'data' | 'bill' | 'deposit';
 
@@ -38,6 +44,7 @@ type WalletContextType = {
     bankName: string;
     amount: number;
     narration: string;
+    recipientName?: string;
   }) => Promise<{ ok: boolean; reference?: string; error?: string }>;
   buyAirtime: (phone: string, network: string, amount: number) => Promise<boolean>;
   buyData: (phone: string, network: string, planCode: string, amount: number) => Promise<boolean>;
@@ -153,18 +160,23 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     bankName: string;
     amount: number;
     narration: string;
+    recipientName?: string;
   }): Promise<{ ok: boolean; reference?: string; error?: string }> => {
+    const displayName = params.recipientName || params.accountNumber;
+
     if (!apiReady) {
       if (params.amount > balance) return { ok: false, error: 'Insufficient balance' };
       setBalance(b => b - params.amount);
+      const ref = 'ZL' + genId().toUpperCase();
       const tx: Transaction = {
         id: genId(), type: 'debit', amount: params.amount,
-        description: params.narration || `Transfer to ${params.accountNumber}`,
-        party: params.accountNumber, date: new Date().toISOString(),
-        status: 'success', category: 'transfer', reference: 'ZL' + genId().toUpperCase(),
+        description: params.narration || `Transfer to ${displayName}`,
+        party: displayName, date: new Date().toISOString(),
+        status: 'success', category: 'transfer', reference: ref,
       };
       addTx(tx);
-      return { ok: true, reference: tx.reference };
+      notifyTransferSent(params.amount, displayName, ref);
+      return { ok: true, reference: ref };
     }
     try {
       const data = await api.sendMoney({
@@ -174,6 +186,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         narration: params.narration,
       });
       setBalance(b => b - params.amount);
+      notifyTransferSent(params.amount, displayName, data.reference);
       return { ok: true, reference: data.reference };
     } catch (e: any) {
       return { ok: false, error: e?.message ?? 'Transfer failed' };
@@ -185,12 +198,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       if (amount > balance) return false;
       setBalance(b => b - amount);
       addTx({ id: genId(), type: 'debit', amount, description: `${network} Airtime - ${phone}`, party: `${network} Nigeria`, date: new Date().toISOString(), status: 'success', category: 'airtime', reference: 'ZL' + genId().toUpperCase() });
+      notifyAirtimeSent(amount, phone, network);
       return true;
     }
     try {
       await api.buyAirtime({ network, phone, amount });
       setBalance(b => b - amount);
       addTx({ id: genId(), type: 'debit', amount, description: `${network} Airtime - ${phone}`, party: `${network} Nigeria`, date: new Date().toISOString(), status: 'success', category: 'airtime', reference: 'ZL' + genId().toUpperCase() });
+      notifyAirtimeSent(amount, phone, network);
       return true;
     } catch { return false; }
   };
@@ -200,12 +215,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       if (amount > balance) return false;
       setBalance(b => b - amount);
       addTx({ id: genId(), type: 'debit', amount, description: `${network} Data - ${planCode}`, party: `${network} Nigeria`, date: new Date().toISOString(), status: 'success', category: 'data', reference: 'ZL' + genId().toUpperCase() });
+      notifyDataPurchased(planCode, phone, network);
       return true;
     }
     try {
       await api.buyData({ network, phone, planCode, amount });
       setBalance(b => b - amount);
       addTx({ id: genId(), type: 'debit', amount, description: `${network} Data - ${planCode}`, party: `${network} Nigeria`, date: new Date().toISOString(), status: 'success', category: 'data', reference: 'ZL' + genId().toUpperCase() });
+      notifyDataPurchased(planCode, phone, network);
       return true;
     } catch { return false; }
   };
@@ -215,6 +232,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       if (amount > balance) return { ok: false, error: 'Insufficient balance' };
       setBalance(b => b - amount);
       addTx({ id: genId(), type: 'debit', amount, description: `${type} - Ref: ${reference}`, party: type, date: new Date().toISOString(), status: 'success', category: 'bill', reference: 'ZL' + genId().toUpperCase() });
+      notifyBillPaid(type, amount);
       return { ok: true };
     }
     try {
@@ -226,6 +244,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       }
       setBalance(b => b - amount);
       addTx({ id: genId(), type: 'debit', amount, description: `${type} - Ref: ${reference}`, party: type, date: new Date().toISOString(), status: 'success', category: 'bill', reference: result.reference });
+      notifyBillPaid(type, amount, result.token);
       return { ok: true, token: result.token };
     } catch (e: any) {
       return { ok: false, error: e?.message };

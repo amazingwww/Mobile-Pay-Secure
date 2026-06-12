@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/context/AuthContext';
 import { useColors } from '@/hooks/useColors';
 import { useBiometric } from '@/hooks/useBiometric';
+import { useNotifications } from '@/hooks/useNotifications';
 
 export default function ProfileScreen() {
   const colors = useColors();
@@ -91,6 +92,26 @@ export default function ProfileScreen() {
     : biometricType === 'fingerprint'
     ? 'Fingerprint'
     : 'Fingerprint or Face ID';
+
+  const {
+    isEnabled: notifEnabled,
+    isLoading: notifLoading,
+    toggle: toggleNotif,
+  } = useNotifications();
+
+  const handleNotifToggle = async (val: boolean) => {
+    if (Platform.OS === 'web') {
+      Alert.alert('Not available', 'Push notifications are only available on iOS and Android.');
+      return;
+    }
+    const result = await toggleNotif(val);
+    if (val && !result) {
+      Alert.alert(
+        'Permission denied',
+        'Please enable notifications for Zela in your device Settings to receive alerts.'
+      );
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -219,6 +240,33 @@ export default function ProfileScreen() {
                 trackColor={{ false: colors.border, true: colors.primary + '60' }}
                 thumbColor={bioEnabled ? colors.primary : colors.mutedForeground}
                 disabled={bioLoading}
+                ios_backgroundColor={colors.border}
+              />
+            </View>
+
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+            {/* Notifications Toggle */}
+            <View style={styles.menuRow}>
+              <View style={[styles.menuIcon, { backgroundColor: colors.muted }]}>
+                <Feather name="bell" size={18} color={colors.foreground} />
+              </View>
+              <View style={styles.menuText}>
+                <Text style={[styles.menuLabel, { color: colors.foreground }]}>Transaction Alerts</Text>
+                <Text style={[styles.menuSub, { color: colors.mutedForeground }]}>
+                  {Platform.OS === 'web'
+                    ? 'Available on iOS & Android'
+                    : notifEnabled
+                    ? 'Enabled — transfers, bills, airtime'
+                    : 'Get notified for every payment'}
+                </Text>
+              </View>
+              <Switch
+                value={notifEnabled}
+                onValueChange={handleNotifToggle}
+                trackColor={{ false: colors.border, true: colors.primary + '60' }}
+                thumbColor={notifEnabled ? colors.primary : colors.mutedForeground}
+                disabled={notifLoading || Platform.OS === 'web'}
                 ios_backgroundColor={colors.border}
               />
             </View>

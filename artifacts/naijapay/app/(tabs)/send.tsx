@@ -118,6 +118,7 @@ export default function SendScreen() {
       bankName,
       amount: amt,
       narration: narration || `Transfer to ${verifiedName}`,
+      recipientName: verifiedName || undefined,
     });
 
     setIsSending(false);
