@@ -1,1 +1,2 @@
 - [expo-local-authentication web crash](expo-local-auth.md) — use .native.ts + .web.ts platform files; the package has no web build and crashes on import.
+- [expo-media-library Metro crash](expo-sdk54-versions.md) — expo-media-library@56 crashes Metro on ENOENT in pnpm store; remove it. Also expo-notifications/expo-local-authentication must be pinned to SDK 54 versions (~0.32.x / ~17.0.x), not latest 56.x.

@@ -32,6 +32,7 @@ function RootLayoutNav() {
       <Stack.Screen name="receive" options={{ headerShown: false }} />
       <Stack.Screen name="bill-payment" options={{ headerShown: false }} />
       <Stack.Screen name="kyc" options={{ headerShown: false }} />
+      <Stack.Screen name="receipt" options={{ headerShown: false }} />
     </Stack>
   );
 }

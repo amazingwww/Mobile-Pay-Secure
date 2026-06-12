@@ -1,6 +1,6 @@
 import { Feather } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useColors } from '@/hooks/useColors';
 import { Transaction, TxCategory } from '@/context/WalletContext';
 
@@ -32,15 +32,21 @@ function getCategoryIcon(cat: TxCategory): { name: string; bg: string; color: st
 
 type Props = {
   tx: Transaction;
+  onPress?: () => void;
 };
 
-export function TransactionItem({ tx }: Props) {
+export function TransactionItem({ tx, onPress }: Props) {
   const colors = useColors();
   const icon = getCategoryIcon(tx.category);
   const isCredit = tx.type === 'credit';
 
   return (
-    <View style={[styles.row, { backgroundColor: colors.card }]}>
+    <TouchableOpacity
+      style={[styles.row, { backgroundColor: colors.card }]}
+      onPress={onPress}
+      activeOpacity={onPress ? 0.65 : 1}
+      disabled={!onPress}
+    >
       <View style={[styles.iconBox, { backgroundColor: icon.bg }]}>
         <Feather name={icon.name as any} size={18} color={icon.color} />
       </View>
@@ -58,7 +64,10 @@ export function TransactionItem({ tx }: Props) {
         </Text>
         <Text style={[styles.date, { color: colors.mutedForeground }]}>{formatDate(tx.date)}</Text>
       </View>
-    </View>
+      {onPress && (
+        <Feather name="chevron-right" size={14} color={colors.mutedForeground} style={{ marginLeft: 2 }} />
+      )}
+    </TouchableOpacity>
   );
 }
 

@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { TransactionItem } from '@/components/TransactionItem';
 import { Transaction, useWallet } from '@/context/WalletContext';
 import { useColors } from '@/hooks/useColors';
@@ -92,7 +93,10 @@ export default function HistoryScreen() {
         keyExtractor={t => t.id}
         renderItem={({ item, index }) => (
           <View>
-            <TransactionItem tx={item} />
+            <TransactionItem
+              tx={item}
+              onPress={() => router.push({ pathname: '/receipt', params: { id: item.id } })}
+            />
             {index < filtered.length - 1 && (
               <View style={[styles.divider, { backgroundColor: colors.border }]} />
             )}

@@ -56,8 +56,9 @@
     "zod-validation-error": "^3.4.0"
   },
   "dependencies": {
-    "expo-device": "^56.0.4",
-    "expo-local-authentication": "^56.0.4",
-    "expo-notifications": "^56.0.17"
+    "expo-local-authentication": "^17.0.8",
+    "expo-notifications": "^0.32.17",
+    "expo-sharing": "^56.0.17",
+    "react-native-view-shot": "^5.1.0"
   }
 }
