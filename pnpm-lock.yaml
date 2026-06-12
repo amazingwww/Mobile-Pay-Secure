@@ -397,6 +397,10 @@ importers:
         version: 3.25.76
 
   artifacts/naijapay:
+    dependencies:
+      expo-local-authentication:
+        specifier: ^56.0.4
+        version: 56.0.4(expo@54.0.35)
     devDependencies:
       '@babel/core':
         specifier: ^7.25.2
@@ -3458,6 +3462,11 @@ packages:
       react: '*'
       react-native: '*'
 
+  expo-local-authentication@56.0.4:
+    resolution: {integrity: sha512-OpW2vs72E+SwHV+82CUlP873yClDaAesa26d2tjnUGxT2FJBJ3+aTncNFZHKjh812JQ0/fB5LVIY25+g+om5zg==}
+    peerDependencies:
+      expo: '*'
+
   expo-location@19.0.8:
     resolution: {integrity: sha512-H/FI75VuJ1coodJbbMu82pf+Zjess8X8Xkiv9Bv58ZgPKS/2ztjC1YO1/XMcGz7+s9DrbLuMIw22dFuP4HqneA==}
     peerDependencies:
@@ -4944,6 +4953,7 @@ packages:
   recharts@2.15.4:
     resolution: {integrity: sha512-UT/q6fwS3c1dHbXv2uFgYJ9BMFHu3fwnd7AYZaEQhXuYQ4hgsxLvsUXzGdKeZrW5xopzDCvuA2N41WJ88I7zIw==}
     engines: {node: '>=14'}
+    deprecated: 1.x and 2.x branches are no longer active. Bump to Recharts v3 to receive latest features and bugfixes. See https://github.com/recharts/recharts/wiki/3.0-migration-guide
     peerDependencies:
       react: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -9346,6 +9356,11 @@ snapshots:
       - expo
       - supports-color
 
+  expo-local-authentication@56.0.4(expo@54.0.35):
+    dependencies:
+      expo: 54.0.35(@babel/core@7.29.0)(@expo/metro-runtime@6.1.2)(expo-router@6.0.24)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)(typescript@5.9.3)
+      invariant: 2.2.4
+
   expo-location@19.0.8(expo@54.0.35):
     dependencies:
       expo: 54.0.35(@babel/core@7.29.0)(@expo/metro-runtime@6.1.2)(expo-router@6.0.24)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)(typescript@5.9.3)
@@ -10248,7 +10263,7 @@ snapshots:
   metro-source-map@0.83.3:
     dependencies:
       '@babel/traverse': 7.29.0
-      '@babel/traverse--for-generate-function-map': '@babel/traverse@7.29.0'
+      '@babel/traverse--for-generate-function-map': '@babel/traverse@7.29.7'
       '@babel/types': 7.29.0
       flow-enums-runtime: 0.0.6
       invariant: 2.2.4

@@ -1,0 +1,1 @@
+- [expo-local-authentication web crash](expo-local-auth.md) — use .native.ts + .web.ts platform files; the package has no web build and crashes on import.

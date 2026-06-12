@@ -6,6 +6,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -13,20 +14,20 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/context/AuthContext';
 import { useColors } from '@/hooks/useColors';
-
-type MenuItem = {
-  icon: string;
-  label: string;
-  sub?: string;
-  color?: string;
-  onPress?: () => void;
-  danger?: boolean;
-};
+import { useBiometric } from '@/hooks/useBiometric';
 
 export default function ProfileScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { user, logout } = useAuth();
+  const {
+    isEnabled: bioEnabled,
+    setEnabled: setBioEnabled,
+    canUseBiometric,
+    biometricType,
+    isLoading: bioLoading,
+    authenticate,
+  } = useBiometric();
 
   const topPad = Platform.OS === 'web' ? 67 : insets.top;
 
@@ -54,67 +55,42 @@ export default function ProfileScreen() {
     );
   };
 
-  const MENU: { section: string; items: MenuItem[] }[] = [
-    {
-      section: 'Account',
-      items: [
-        {
-          icon: 'user',
-          label: 'Personal Information',
-          sub: 'Name, phone, email',
-          onPress: () => Alert.alert('Coming Soon', 'Profile editing is coming soon.'),
-        },
-        {
-          icon: 'credit-card',
-          label: 'Account Details',
-          sub: user?.accountNumber,
-          onPress: () => router.push('/receive'),
-        },
-        {
-          icon: 'shield',
-          label: 'Verification',
-          sub: user?.tier === 'Tier 2' ? 'Verified ✓' : 'Upgrade to Tier 2',
-          color: user?.tier === 'Tier 2' ? '#16A34A' : undefined,
-          onPress: () =>
-            user?.tier === 'Tier 2'
-              ? Alert.alert('Verified', 'Your account is fully verified (Tier 2).')
-              : router.push('/kyc'),
-        },
-      ],
-    },
-    {
-      section: 'Security',
-      items: [
-        {
-          icon: 'lock',
-          label: 'Change PIN',
-          sub: 'Update your 4-digit PIN',
-          onPress: () => Alert.alert('Coming Soon', 'PIN change is coming soon.'),
-        },
-        {
-          icon: 'smartphone',
-          label: 'Biometric Login',
-          sub: 'Fingerprint or Face ID',
-          onPress: () => Alert.alert('Coming Soon', 'Biometric login is coming soon.'),
-        },
-      ],
-    },
-    {
-      section: 'Support',
-      items: [
-        {
-          icon: 'help-circle',
-          label: 'Help Center',
-          onPress: () => Alert.alert('Help Center', 'For support, call 0800-ZELA or email support@zela.ng'),
-        },
-        {
-          icon: 'message-square',
-          label: 'Live Chat',
-          onPress: () => Alert.alert('Live Chat', 'Our agents are available 24/7. Feature coming soon.'),
-        },
-      ],
-    },
-  ];
+  const handleBiometricToggle = async (val: boolean) => {
+    if (Platform.OS === 'web') {
+      Alert.alert('Not available', 'Biometric login is only available on iOS and Android.');
+      return;
+    }
+    if (!canUseBiometric) {
+      Alert.alert(
+        'Not available',
+        'Your device doesn\'t have biometric authentication set up. Please enrol in your device settings first.'
+      );
+      return;
+    }
+    if (val) {
+      // Verify identity before enabling
+      const ok = await authenticate();
+      if (ok) {
+        await setBioEnabled(true);
+        const label = biometricType === 'face' ? 'Face ID' : 'Fingerprint';
+        Alert.alert(`${label} enabled`, `You can now log in with ${label}.`);
+      } else {
+        Alert.alert('Authentication failed', 'Biometric login was not enabled.');
+      }
+    } else {
+      await setBioEnabled(false);
+    }
+  };
+
+  const biometricLabel = bioLoading
+    ? 'Checking...'
+    : !canUseBiometric && Platform.OS !== 'web'
+    ? 'Not available on this device'
+    : biometricType === 'face'
+    ? 'Face ID'
+    : biometricType === 'fingerprint'
+    ? 'Fingerprint'
+    : 'Fingerprint or Face ID';
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -155,39 +131,131 @@ export default function ProfileScreen() {
           <Feather name="copy" size={22} color="rgba(255,255,255,0.7)" />
         </TouchableOpacity>
 
-        {/* Menu Sections */}
-        {MENU.map(section => (
-          <View key={section.section} style={styles.menuSection}>
-            <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>{section.section}</Text>
-            <View style={[styles.menuCard, { backgroundColor: colors.card }]}>
-              {section.items.map((item, i) => (
-                <View key={i}>
-                  <TouchableOpacity
-                    style={styles.menuRow}
-                    onPress={item.onPress}
-                    activeOpacity={0.7}
-                  >
-                    <View style={[styles.menuIcon, { backgroundColor: colors.muted }]}>
-                      <Feather name={item.icon as any} size={18} color={item.danger ? colors.destructive : colors.foreground} />
-                    </View>
-                    <View style={styles.menuText}>
-                      <Text style={[styles.menuLabel, { color: item.danger ? colors.destructive : colors.foreground }]}>
-                        {item.label}
-                      </Text>
-                      {item.sub && (
-                        <Text style={[styles.menuSub, { color: item.color ?? colors.mutedForeground }]}>{item.sub}</Text>
-                      )}
-                    </View>
-                    <Feather name="chevron-right" size={18} color={colors.mutedForeground} />
-                  </TouchableOpacity>
-                  {i < section.items.length - 1 && (
-                    <View style={[styles.divider, { backgroundColor: colors.border }]} />
-                  )}
-                </View>
-              ))}
+        {/* Account Section */}
+        <View style={styles.menuSection}>
+          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>Account</Text>
+          <View style={[styles.menuCard, { backgroundColor: colors.card }]}>
+            {[
+              {
+                icon: 'user',
+                label: 'Personal Information',
+                sub: 'Name, phone, email',
+                onPress: () => Alert.alert('Coming Soon', 'Profile editing is coming soon.'),
+              },
+              {
+                icon: 'credit-card',
+                label: 'Account Details',
+                sub: user?.accountNumber,
+                onPress: () => router.push('/receive'),
+              },
+              {
+                icon: 'shield',
+                label: 'Verification',
+                sub: user?.tier === 'Tier 2' ? 'Verified ✓' : 'Upgrade to Tier 2',
+                color: user?.tier === 'Tier 2' ? '#16A34A' : undefined,
+                onPress: () =>
+                  user?.tier === 'Tier 2'
+                    ? Alert.alert('Verified', 'Your account is fully verified (Tier 2).')
+                    : router.push('/kyc'),
+              },
+            ].map((item, i, arr) => (
+              <View key={i}>
+                <TouchableOpacity style={styles.menuRow} onPress={item.onPress} activeOpacity={0.7}>
+                  <View style={[styles.menuIcon, { backgroundColor: colors.muted }]}>
+                    <Feather name={item.icon as any} size={18} color={colors.foreground} />
+                  </View>
+                  <View style={styles.menuText}>
+                    <Text style={[styles.menuLabel, { color: colors.foreground }]}>{item.label}</Text>
+                    {item.sub && (
+                      <Text style={[styles.menuSub, { color: (item as any).color ?? colors.mutedForeground }]}>{item.sub}</Text>
+                    )}
+                  </View>
+                  <Feather name="chevron-right" size={18} color={colors.mutedForeground} />
+                </TouchableOpacity>
+                {i < arr.length - 1 && <View style={[styles.divider, { backgroundColor: colors.border }]} />}
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* Security Section */}
+        <View style={styles.menuSection}>
+          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>Security</Text>
+          <View style={[styles.menuCard, { backgroundColor: colors.card }]}>
+            {/* Change PIN */}
+            <TouchableOpacity
+              style={styles.menuRow}
+              onPress={() => Alert.alert('Coming Soon', 'PIN change is coming soon.')}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.menuIcon, { backgroundColor: colors.muted }]}>
+                <Feather name="lock" size={18} color={colors.foreground} />
+              </View>
+              <View style={styles.menuText}>
+                <Text style={[styles.menuLabel, { color: colors.foreground }]}>Change PIN</Text>
+                <Text style={[styles.menuSub, { color: colors.mutedForeground }]}>Update your 4-digit PIN</Text>
+              </View>
+              <Feather name="chevron-right" size={18} color={colors.mutedForeground} />
+            </TouchableOpacity>
+
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+            {/* Biometric Toggle */}
+            <View style={styles.menuRow}>
+              <View style={[styles.menuIcon, { backgroundColor: colors.muted }]}>
+                <Feather
+                  name={biometricType === 'face' ? 'smile' : 'smartphone'}
+                  size={18}
+                  color={colors.foreground}
+                />
+              </View>
+              <View style={styles.menuText}>
+                <Text style={[styles.menuLabel, { color: colors.foreground }]}>Biometric Login</Text>
+                <Text style={[styles.menuSub, { color: colors.mutedForeground }]}>{biometricLabel}</Text>
+              </View>
+              <Switch
+                value={bioEnabled}
+                onValueChange={handleBiometricToggle}
+                trackColor={{ false: colors.border, true: colors.primary + '60' }}
+                thumbColor={bioEnabled ? colors.primary : colors.mutedForeground}
+                disabled={bioLoading}
+                ios_backgroundColor={colors.border}
+              />
             </View>
           </View>
-        ))}
+        </View>
+
+        {/* Support Section */}
+        <View style={styles.menuSection}>
+          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>Support</Text>
+          <View style={[styles.menuCard, { backgroundColor: colors.card }]}>
+            {[
+              {
+                icon: 'help-circle',
+                label: 'Help Center',
+                onPress: () => Alert.alert('Help Center', 'For support, call 0800-ZELA or email support@zela.ng'),
+              },
+              {
+                icon: 'message-square',
+                label: 'Live Chat',
+                onPress: () => Alert.alert('Live Chat', 'Our agents are available 24/7. Feature coming soon.'),
+              },
+            ].map((item, i, arr) => (
+              <View key={i}>
+                <TouchableOpacity style={styles.menuRow} onPress={item.onPress} activeOpacity={0.7}>
+                  <View style={[styles.menuIcon, { backgroundColor: colors.muted }]}>
+                    <Feather name={item.icon as any} size={18} color={colors.foreground} />
+                  </View>
+                  <View style={styles.menuText}>
+                    <Text style={[styles.menuLabel, { color: colors.foreground }]}>{item.label}</Text>
+                  </View>
+                  <Feather name="chevron-right" size={18} color={colors.mutedForeground} />
+                </TouchableOpacity>
+                {i < arr.length - 1 && <View style={[styles.divider, { backgroundColor: colors.border }]} />}
+              </View>
+            ))}
+          </View>
+        </View>
 
         {/* Logout */}
         <View style={styles.menuSection}>
@@ -237,24 +305,24 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarInitials: {
     color: '#fff',
     fontFamily: 'Inter_700Bold',
-    fontSize: 20,
+    fontSize: 18,
   },
   avatarInfo: {
     flex: 1,
-    gap: 4,
+    gap: 3,
   },
   userName: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 16,
+    fontSize: 15,
   },
   userPhone: {
     fontFamily: 'Inter_400Regular',
@@ -270,46 +338,49 @@ const styles = StyleSheet.create({
   },
   tierText: {
     fontFamily: 'Inter_500Medium',
-    fontSize: 11,
+    fontSize: 12,
   },
   acctCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginHorizontal: 16,
     borderRadius: 16,
-    padding: 18,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    padding: 20,
     marginBottom: 20,
+    shadowColor: '#00A859',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 4,
   },
   acctCardLabel: {
-    color: 'rgba(255,255,255,0.7)',
     fontFamily: 'Inter_400Regular',
-    fontSize: 11,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.7)',
     marginBottom: 4,
   },
   acctCardNumber: {
-    color: '#fff',
     fontFamily: 'Inter_700Bold',
-    fontSize: 20,
+    fontSize: 22,
+    color: '#fff',
     letterSpacing: 2,
     marginBottom: 4,
   },
   acctCardBank: {
-    color: 'rgba(255,255,255,0.8)',
     fontFamily: 'Inter_400Regular',
     fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
   },
   menuSection: {
-    paddingHorizontal: 16,
-    marginBottom: 12,
+    marginHorizontal: 16,
+    marginBottom: 16,
   },
   sectionLabel: {
     fontFamily: 'Inter_500Medium',
     fontSize: 11,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 1,
     marginBottom: 8,
     marginLeft: 4,
   },
@@ -319,18 +390,20 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
-    shadowRadius: 6,
+    shadowRadius: 8,
     elevation: 2,
   },
   menuRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    gap: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    gap: 14,
+    minHeight: 60,
   },
   menuIcon: {
-    width: 38,
-    height: 38,
+    width: 36,
+    height: 36,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
@@ -341,7 +414,7 @@ const styles = StyleSheet.create({
   },
   menuLabel: {
     fontFamily: 'Inter_500Medium',
-    fontSize: 14,
+    fontSize: 15,
   },
   menuSub: {
     fontFamily: 'Inter_400Regular',
@@ -352,9 +425,9 @@ const styles = StyleSheet.create({
     marginLeft: 66,
   },
   version: {
-    textAlign: 'center',
     fontFamily: 'Inter_400Regular',
     fontSize: 12,
-    marginVertical: 16,
+    textAlign: 'center',
+    paddingVertical: 16,
   },
 });

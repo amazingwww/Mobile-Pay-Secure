@@ -1,18 +1,21 @@
 import { Feather } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Platform,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { PinPad } from '@/components/PinPad';
 import { useAuth } from '@/context/AuthContext';
 import { useColors } from '@/hooks/useColors';
+import { useBiometric } from '@/hooks/useBiometric';
 
 const PIN_LENGTH = 4;
 
@@ -20,10 +23,25 @@ export default function LoginScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { user, login } = useAuth();
+  const { isEnabled, canUseBiometric, biometricType, isLoading: bioLoading, authenticate } = useBiometric();
+
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [attempts, setAttempts] = useState(0);
-  const shakeAnim = React.useRef(new Animated.Value(0)).current;
+  const shakeAnim = useRef(new Animated.Value(0)).current;
+  const bioButtonScale = useRef(new Animated.Value(1)).current;
+
+  const topPad = Platform.OS === 'web' ? 67 : insets.top;
+  const bottomPad = Platform.OS === 'web' ? 34 : insets.bottom;
+
+  // Auto-trigger biometric on first load if enabled
+  useEffect(() => {
+    if (!bioLoading && isEnabled && canUseBiometric) {
+      // Small delay so the screen renders first
+      const t = setTimeout(() => triggerBiometric(), 500);
+      return () => clearTimeout(t);
+    }
+  }, [bioLoading, isEnabled, canUseBiometric]);
 
   const shake = () => {
     Animated.sequence([
@@ -61,10 +79,30 @@ export default function LoginScreen() {
     setError('');
   };
 
-  const firstName = user?.name?.split(' ')[0] ?? 'Welcome';
+  const triggerBiometric = async () => {
+    // Bounce animation on the button
+    Animated.sequence([
+      Animated.timing(bioButtonScale, { toValue: 0.88, duration: 100, useNativeDriver: true }),
+      Animated.timing(bioButtonScale, { toValue: 1, duration: 150, useNativeDriver: true }),
+    ]).start();
 
-  const topPad = Platform.OS === 'web' ? 67 : insets.top;
-  const bottomPad = Platform.OS === 'web' ? 34 : insets.bottom;
+    const success = await authenticate();
+    if (success) {
+      if (Platform.OS !== 'web') {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+      router.replace('/(tabs)/');
+    } else {
+      if (Platform.OS !== 'web') {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      }
+      setError('Biometric authentication failed. Use your PIN.');
+    }
+  };
+
+  const biometricIcon = biometricType === 'face' ? 'smile' : 'smartphone';
+
+  const firstName = user?.name?.split(' ')[0] ?? 'Welcome';
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background, paddingTop: topPad, paddingBottom: bottomPad + 16 }]}>
@@ -109,6 +147,27 @@ export default function LoginScreen() {
       )}
 
       <PinPad onPress={handleDigit} onDelete={handleDelete} />
+
+      {/* Biometric button — only shown when enabled and available */}
+      {!bioLoading && isEnabled && canUseBiometric && Platform.OS !== 'web' ? (
+        <View style={styles.bioSection}>
+          <Animated.View style={{ transform: [{ scale: bioButtonScale }] }}>
+            <TouchableOpacity
+              style={[styles.bioButton, { backgroundColor: colors.card, borderColor: colors.border }]}
+              onPress={triggerBiometric}
+              activeOpacity={0.75}
+            >
+              <Feather name={biometricIcon as any} size={26} color={colors.primary} />
+            </TouchableOpacity>
+          </Animated.View>
+          <Text style={[styles.bioLabel, { color: colors.mutedForeground }]}>
+            {biometricType === 'face' ? 'Face ID' : 'Fingerprint'}
+          </Text>
+        </View>
+      ) : (
+        // Spacer to keep layout stable
+        <View style={styles.bioSection} />
+      )}
     </View>
   );
 }
@@ -186,5 +245,28 @@ const styles = StyleSheet.create({
   errorText: {
     fontFamily: 'Inter_400Regular',
     fontSize: 13,
+  },
+  bioSection: {
+    alignItems: 'center',
+    gap: 8,
+    minHeight: 80,
+    justifyContent: 'center',
+  },
+  bioButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  bioLabel: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 12,
   },
 });
