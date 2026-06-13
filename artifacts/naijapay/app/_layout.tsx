@@ -40,6 +40,7 @@ function RootLayoutNav() {
       <Stack.Screen name="analytics" options={{ headerShown: false }} />
       <Stack.Screen name="scheduled" options={{ headerShown: false }} />
       <Stack.Screen name="cards" options={{ headerShown: false }} />
+      <Stack.Screen name="savings-product" options={{ headerShown: false }} />
     </Stack>
   );
 }

@@ -23,6 +23,7 @@ type Product = {
   desc: string;
   badge: string | null;
   gradients: [string, string, ...string[]];
+  productKey: string;
 };
 
 const PRODUCTS: Product[] = [
@@ -34,6 +35,7 @@ const PRODUCTS: Product[] = [
     desc: 'Set a daily, weekly or monthly auto-debit and watch your money grow effortlessly.',
     badge: null,
     gradients: ['#1D4ED8', '#3B82F6'],
+    productKey: 'autosave',
   },
   {
     emoji: '🎯',
@@ -43,6 +45,7 @@ const PRODUCTS: Product[] = [
     desc: 'Create a goal — school fees, vacation, gadget — and track your progress every day.',
     badge: null,
     gradients: ['#6D28D9', '#8B5CF6'],
+    productKey: 'targets',
   },
   {
     emoji: '🔒',
@@ -52,24 +55,27 @@ const PRODUCTS: Product[] = [
     desc: 'Lock funds for a fixed period and earn higher interest. Break only when you need to.',
     badge: null,
     gradients: ['#065F46', '#059669'],
+    productKey: 'safebox',
   },
   {
     emoji: '📈',
     name: 'Fixed Deposit',
     tagline: 'Maximum returns',
-    rate: '15% p.a.',
-    desc: 'Park your funds for 30–360 days at our highest interest rate. Ideal for lump sums.',
+    rate: '15–18% p.a.',
+    desc: 'Park your funds for 30–1000 days at our highest interest rate. Ideal for lump sums.',
     badge: 'New',
     gradients: ['#92400E', '#D97706'],
+    productKey: 'fixed',
   },
   {
     emoji: '🛍️',
     name: 'Spend & Save',
     tagline: 'Save as you spend',
-    rate: '10% p.a.',
+    rate: '10–15% p.a.',
     desc: 'Every time you spend, a percentage goes straight into your savings. Painless saving.',
     badge: null,
     gradients: ['#9F1239', '#E11D48'],
+    productKey: 'spend_save',
   },
 ];
 
@@ -82,7 +88,7 @@ function ProductCard({ p, colors }: { p: Product; colors: any }) {
   return (
     <TouchableOpacity
       style={styles.productCard}
-      onPress={() => router.push('/savings')}
+      onPress={() => router.push({ pathname: '/savings-product', params: { product: p.productKey } })}
       activeOpacity={0.88}
     >
       <LinearGradient
