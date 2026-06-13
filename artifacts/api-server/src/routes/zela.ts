@@ -105,7 +105,7 @@ router.post("/transfer/send", async (req, res) => {
       creditAccountNumber: accountNumber,
       creditBankCode: bankCode,
       amount,
-      narration: narration ?? "Zela Transfer",
+      narration: narration ?? "Guudees Transfer",
     });
     const data = await r.json() as any;
     if (!r.ok) return res.status(r.status).json({ message: data?.message ?? "Transfer failed" });
@@ -243,7 +243,7 @@ const FALLBACK_BANKS = [
   { name: "Stanbic IBTC", code: "221" },
   { name: "Union Bank", code: "032" },
   { name: "Polaris Bank", code: "076" },
-  { name: "Zela MFB", code: "090xxx" },
+  { name: "Guudees Digital Services", code: "090xxx" },
 ];
 
 export default router;
