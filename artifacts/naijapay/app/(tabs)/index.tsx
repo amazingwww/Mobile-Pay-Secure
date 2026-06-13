@@ -105,6 +105,13 @@ export default function HomeScreen() {
           color="#D97706"
           bg="#FFFBEB"
         />
+        <QuickAction
+          icon="credit-card"
+          label="Cards"
+          onPress={() => router.push('/cards')}
+          color="#7C3AED"
+          bg="#F5F3FF"
+        />
       </View>
 
       {/* Promo Banner */}
