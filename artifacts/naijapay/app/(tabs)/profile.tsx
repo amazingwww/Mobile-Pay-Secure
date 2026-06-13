@@ -321,7 +321,7 @@ export default function ProfileScreen() {
         </View>
 
         <Text style={[styles.version, { color: colors.mutedForeground }]}>
-          Guudees v1.0.0 {'\u2022'} CBN Licensed
+          Guudees v1.0.0 {'\u2022'} CBN Regulated
         </Text>
       </ScrollView>
     </View>

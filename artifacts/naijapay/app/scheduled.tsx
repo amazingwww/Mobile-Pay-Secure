@@ -29,7 +29,7 @@ const BANKS = [
   { name: 'First Bank', code: '011' },
   { name: 'Stanbic IBTC', code: '039' },
   { name: 'Sterling Bank', code: '232' },
-  { name: 'Guudees MFB', code: '090xxx' },
+  { name: 'Guudees Digital Services', code: '090xxx' },
 ];
 
 function fmt(n: number) {
@@ -288,7 +288,7 @@ export default function ScheduledScreen() {
 
               {/* Bank picker */}
               <View>
-                <Text style={[styles.formLabel, { color: colors.mutedForeground }]}>Bank</Text>
+                <Text style={[styles.formLabel, { color: colors.mutedForeground }]}>Provider</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8 }}>
                   <View style={styles.bankRow}>
                     {BANKS.map(b => (

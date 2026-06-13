@@ -250,7 +250,7 @@ export default function KYCScreen() {
               <View style={[styles.requirementsCard, { backgroundColor: colors.card }]}>
                 <Text style={[styles.reqTitle, { color: colors.foreground }]}>What you'll need</Text>
                 {[
-                  { icon: 'credit-card', label: 'Your BVN', sub: '11-digit Bank Verification Number' },
+                  { icon: 'credit-card', label: 'Your BVN', sub: '11-digit BVN (National ID for financial services)' },
                   { icon: 'calendar', label: 'Date of Birth', sub: 'Matching your BVN record' },
                   { icon: 'camera', label: 'A selfie', sub: 'Clear photo of your face in good lighting' },
                 ].map((item, i) => (

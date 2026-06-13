@@ -27,7 +27,7 @@ const FALLBACK_BANKS = [
   { name: 'Fidelity Bank', code: '070' },
   { name: 'Sterling Bank', code: '232' },
   { name: 'Kuda Bank', code: '090267' },
-  { name: 'Guudees MFB', code: '090xxx' },
+  { name: 'Guudees Digital Services', code: '090xxx' },
   { name: 'Opay', code: '304' },
   { name: 'Palmpay', code: '999991' },
   { name: 'Moniepoint', code: '50515' },
@@ -180,7 +180,7 @@ export default function SendScreen() {
 
         {/* Bank + Account */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
-          <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>Bank</Text>
+          <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>Provider</Text>
           <TouchableOpacity style={[styles.picker, { borderColor: colors.border }]} onPress={() => setShowBankPicker(true)} activeOpacity={0.7}>
             <Text style={[styles.pickerText, { color: selectedBank ? colors.foreground : colors.mutedForeground }]}>
               {bankName || 'Select bank'}
@@ -270,7 +270,7 @@ export default function SendScreen() {
         <View style={styles.modalOverlay}>
           <View style={[styles.modalSheet, { backgroundColor: colors.card }]}>
             <View style={styles.modalHandle} />
-            <Text style={[styles.modalTitle, { color: colors.foreground }]}>Select Bank</Text>
+            <Text style={[styles.modalTitle, { color: colors.foreground }]}>Select Provider</Text>
             <ScrollView>
               {banks.map(b => (
                 <TouchableOpacity key={b.code} style={[styles.bankRow, { borderBottomColor: colors.border }]} onPress={() => handleBankSelect(b.code)} activeOpacity={0.7}>

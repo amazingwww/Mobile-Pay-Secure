@@ -27,7 +27,7 @@ const DEFAULT_USER: User = {
   name: 'Adebayo Okonkwo',
   accountNumber: '0123456789',
   accountName: 'ADEBAYO OKONKWO',
-  bankName: 'Guudees MFB',
+  bankName: 'Guudees Digital Services',
   phone: '+234 801 234 5678',
   email: 'adebayo@guudees.ng',
   bvn: '22*******12',
@@ -52,8 +52,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (stored) {
         const parsed = JSON.parse(stored) as User;
         // Migrate old bank name if needed
-        if (parsed.bankName === 'Zela Microfinance Bank') {
-          parsed.bankName = 'Guudees MFB';
+        if (parsed.bankName === 'Zela Microfinance Bank' || parsed.bankName === 'Guudees MFB') {
+          parsed.bankName = 'Guudees Digital Services';
         }
         setUser(parsed);
       } else {

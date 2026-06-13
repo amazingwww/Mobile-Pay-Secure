@@ -102,7 +102,7 @@ export default function ReceiveScreen() {
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
           <View style={styles.detailRow}>
-            <Text style={[styles.detailLabel, { color: colors.mutedForeground }]}>Bank</Text>
+            <Text style={[styles.detailLabel, { color: colors.mutedForeground }]}>Provider</Text>
             <Text style={[styles.detailValue, { color: colors.foreground }]}>{user?.bankName}</Text>
           </View>
 
@@ -125,7 +125,7 @@ export default function ReceiveScreen() {
         </View>
 
         <Text style={[styles.hint, { color: colors.mutedForeground }]}>
-          Share your account number with anyone to receive transfers from any Nigerian bank
+          Share your account number with anyone to receive transfers from any Nigerian institution
         </Text>
       </View>
     </View>

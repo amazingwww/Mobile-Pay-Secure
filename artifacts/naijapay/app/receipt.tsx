@@ -44,7 +44,7 @@ function fmtTime(iso: string) {
 
 function categoryLabel(cat: Transaction['category']) {
   switch (cat) {
-    case 'transfer': return 'Bank Transfer';
+    case 'transfer': return 'Transfer';
     case 'airtime': return 'Airtime Top-Up';
     case 'data': return 'Data Purchase';
     case 'bill': return 'Bill Payment';
@@ -235,7 +235,7 @@ export default function ReceiptScreen() {
                 { label: 'Time', value: fmtTime(tx.date) },
                 { label: 'Reference', value: tx.reference, mono: true },
                 { label: 'Account', value: user?.accountNumber ?? '—' },
-                { label: 'Bank', value: user?.bankName ?? 'Guudees MFB' },
+                { label: 'Provider', value: user?.bankName ?? 'Guudees Digital Services' },
               ].map((row, i) => (
                 <View key={i} style={[styles.detailRow, i > 0 && { borderTopWidth: 1, borderTopColor: colors.border }]}>
                   <Text style={[styles.detailLabel, { color: colors.mutedForeground }]}>{row.label}</Text>
@@ -253,7 +253,7 @@ export default function ReceiptScreen() {
             {/* Footer */}
             <View style={[styles.cardFooter, { borderTopColor: colors.border }]}>
               <Text style={[styles.footerText, { color: colors.mutedForeground }]}>
-                Issued by Guudees MFB • CBN Licensed
+                Issued by Guudees Digital Services • CBN Licensed
               </Text>
               <Text style={[styles.footerText, { color: colors.mutedForeground }]}>
                 Generated {fmtDate(new Date().toISOString())} at {fmtTime(new Date().toISOString())}
