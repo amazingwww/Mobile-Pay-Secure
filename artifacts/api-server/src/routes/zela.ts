@@ -210,39 +210,97 @@ router.post("/bills/cable", async (req, res) => {
 
 // GET /api/zela/banks
 router.get("/banks", async (req, res) => {
-  if (!isConfigured()) {
-    return res.json({ banks: FALLBACK_BANKS });
+  // 1. Try Safe Haven (when credentials are set)
+  if (isConfigured()) {
+    try {
+      const r = await shGet("/transfers/banks");
+      const data = await r.json() as any;
+      if (r.ok) {
+        const banks = (data?.data ?? []).map((b: any) => ({
+          name: b.bankName ?? b.name,
+          code: b.bankCode ?? b.code,
+        })).filter((b: any) => b.name && b.code);
+        if (banks.length) return res.json({ banks });
+      }
+    } catch (err) {
+      req.log.warn({ err }, "Safe Haven banks fetch failed, falling back");
+    }
   }
+
+  // 2. Fetch from Paystack public NIBSS list (free, no auth)
   try {
-    const r = await shGet("/transfers/banks");
-    const data = await r.json() as any;
-    if (!r.ok) return res.json({ banks: FALLBACK_BANKS });
-    const banks = (data?.data ?? []).map((b: any) => ({
-      name: b.bankName ?? b.name,
-      code: b.bankCode ?? b.code,
-    }));
-    res.json({ banks: banks.length ? banks : FALLBACK_BANKS });
-  } catch {
-    res.json({ banks: FALLBACK_BANKS });
+    const r = await fetch("https://api.paystack.co/bank?country=nigeria&perPage=200&use_cursor=false", {
+      headers: { "Cache-Control": "no-cache" },
+    });
+    if (r.ok) {
+      const data = await r.json() as any;
+      const banks = (data?.data ?? [])
+        .filter((b: any) => b.active && !b.is_deleted && b.code && b.name)
+        .map((b: any) => ({ name: b.name, code: b.code }));
+      if (banks.length) {
+        req.log.info({ count: banks.length }, "banks fetched from NIBSS via Paystack");
+        return res.json({ banks });
+      }
+    }
+  } catch (err) {
+    req.log.warn({ err }, "Paystack banks fetch failed, using hardcoded list");
   }
+
+  // 3. Comprehensive hardcoded NIBSS list
+  res.json({ banks: NIBSS_BANKS });
 });
 
-const FALLBACK_BANKS = [
+// Full NIBSS-sourced bank list (commercial banks + fintechs + MFBs)
+const NIBSS_BANKS = [
+  // Commercial Banks
   { name: "Access Bank", code: "044" },
-  { name: "Zenith Bank", code: "057" },
-  { name: "GTBank", code: "058" },
-  { name: "First Bank", code: "011" },
-  { name: "UBA", code: "033" },
+  { name: "Citibank Nigeria", code: "023" },
+  { name: "Ecobank Nigeria", code: "050" },
+  { name: "FCMB", code: "214" },
   { name: "Fidelity Bank", code: "070" },
-  { name: "Sterling Bank", code: "232" },
-  { name: "Kuda Bank", code: "090267" },
-  { name: "Opay", code: "304" },
-  { name: "Palmpay", code: "999991" },
-  { name: "Moniepoint", code: "50515" },
-  { name: "Wema Bank", code: "035" },
-  { name: "Stanbic IBTC", code: "221" },
-  { name: "Union Bank", code: "032" },
+  { name: "First Bank of Nigeria", code: "011" },
+  { name: "GTBank", code: "058" },
+  { name: "Heritage Bank", code: "030" },
+  { name: "Keystone Bank", code: "082" },
   { name: "Polaris Bank", code: "076" },
+  { name: "Providus Bank", code: "101" },
+  { name: "Stanbic IBTC Bank", code: "221" },
+  { name: "Standard Chartered Bank", code: "068" },
+  { name: "Sterling Bank", code: "232" },
+  { name: "Titan Trust Bank", code: "102" },
+  { name: "UBA", code: "033" },
+  { name: "Union Bank", code: "032" },
+  { name: "Unity Bank", code: "215" },
+  { name: "Wema Bank", code: "035" },
+  { name: "Zenith Bank", code: "057" },
+  // Non-interest Banks
+  { name: "Jaiz Bank", code: "301" },
+  { name: "Lotus Bank", code: "303" },
+  { name: "Taj Bank", code: "302" },
+  // Merchant/Development Banks
+  { name: "Coronation Merchant Bank", code: "559" },
+  { name: "FBNQuest Merchant Bank", code: "060002" },
+  { name: "FSDH Merchant Bank", code: "501" },
+  { name: "Nova Merchant Bank", code: "060003" },
+  { name: "Rand Merchant Bank", code: "502" },
+  // Payment Service Banks
+  { name: "9Payment Service Bank (9PSB)", code: "120001" },
+  { name: "Hope PSBank", code: "120002" },
+  { name: "Moneymaster PSBank", code: "120003" },
+  // Fintechs & MFBs
+  { name: "Carbon", code: "565" },
+  { name: "Eyowo", code: "50126" },
+  { name: "Fairmoney Microfinance Bank", code: "090325" },
+  { name: "Kuda Bank", code: "090267" },
+  { name: "Mint Finex MFB", code: "090110" },
+  { name: "Mkobo MFB", code: "090115" },
+  { name: "Moniepoint MFB", code: "50515" },
+  { name: "Opay", code: "100004" },
+  { name: "Paga", code: "100002" },
+  { name: "PalmPay", code: "999991" },
+  { name: "Rubies MFB", code: "090175" },
+  { name: "Sparkle MFB", code: "090325" },
+  { name: "VFD Microfinance Bank", code: "566" },
   { name: "Guudees Digital Services", code: "090xxx" },
 ];
 

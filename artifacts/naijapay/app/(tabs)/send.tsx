@@ -1,6 +1,6 @@
 import { Feather } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Modal,
@@ -18,21 +18,6 @@ import { useWallet } from '@/context/WalletContext';
 import { useColors } from '@/hooks/useColors';
 import { api } from '@/lib/api';
 
-const FALLBACK_BANKS = [
-  { name: 'Access Bank', code: '044' },
-  { name: 'Zenith Bank', code: '057' },
-  { name: 'GTBank', code: '058' },
-  { name: 'First Bank', code: '011' },
-  { name: 'UBA', code: '033' },
-  { name: 'Fidelity Bank', code: '070' },
-  { name: 'Sterling Bank', code: '232' },
-  { name: 'Kuda Bank', code: '090267' },
-  { name: 'Guudees Digital Services', code: '090xxx' },
-  { name: 'Opay', code: '304' },
-  { name: 'Palmpay', code: '999991' },
-  { name: 'Moniepoint', code: '50515' },
-];
-
 function formatAmount(n: number) {
   return n.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -42,7 +27,9 @@ export default function SendScreen() {
   const insets = useSafeAreaInsets();
   const { balance, beneficiaries, sendMoney, addBeneficiary, verifyAccount, apiReady } = useWallet();
 
-  const [banks, setBanks] = useState(FALLBACK_BANKS);
+  const [banks, setBanks] = useState<{ name: string; code: string }[]>([]);
+  const [banksLoading, setBanksLoading] = useState(true);
+  const [bankSearch, setBankSearch] = useState('');
   const [selectedBank, setSelectedBank] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [verifiedName, setVerifiedName] = useState('');
@@ -55,10 +42,20 @@ export default function SendScreen() {
   const [successRef, setSuccessRef] = useState('');
   const [saveBene, setSaveBene] = useState(false);
 
+  const filteredBanks = useMemo(() => {
+    if (!bankSearch.trim()) return banks;
+    const q = bankSearch.toLowerCase();
+    return banks.filter(b => b.name.toLowerCase().includes(q));
+  }, [banks, bankSearch]);
+
   const topPad = Platform.OS === 'web' ? 67 : insets.top;
 
   useEffect(() => {
-    api.getBanks().then(d => { if (d.banks.length) setBanks(d.banks); }).catch(() => {});
+    setBanksLoading(true);
+    api.getBanks()
+      .then(d => { if (d.banks?.length) setBanks(d.banks); })
+      .catch(() => {})
+      .finally(() => setBanksLoading(false));
   }, []);
 
   const handleAccountChange = (text: string) => {
@@ -85,10 +82,16 @@ export default function SendScreen() {
   const handleBankSelect = (code: string) => {
     setSelectedBank(code);
     setShowBankPicker(false);
+    setBankSearch('');
     setVerifiedName('');
     if (accountNumber.length === 10) {
       doVerify(accountNumber, code);
     }
+  };
+
+  const handleOpenBankPicker = () => {
+    setBankSearch('');
+    setShowBankPicker(true);
   };
 
   const handleBeneficiarySelect = (b: typeof beneficiaries[0]) => {
@@ -181,9 +184,12 @@ export default function SendScreen() {
         {/* Bank + Account */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>Provider</Text>
-          <TouchableOpacity style={[styles.picker, { borderColor: colors.border }]} onPress={() => setShowBankPicker(true)} activeOpacity={0.7}>
-            <Text style={[styles.pickerText, { color: selectedBank ? colors.foreground : colors.mutedForeground }]}>
-              {bankName || 'Select bank'}
+          <TouchableOpacity style={[styles.picker, { borderColor: colors.border }]} onPress={handleOpenBankPicker} activeOpacity={0.7}>
+            {banksLoading ? (
+              <ActivityIndicator size="small" color={colors.primary} style={{ marginRight: 8 }} />
+            ) : null}
+            <Text style={[styles.pickerText, { color: selectedBank ? colors.foreground : colors.mutedForeground, flex: 1 }]}>
+              {bankName || (banksLoading ? 'Loading banks…' : 'Select bank')}
             </Text>
             <Feather name="chevron-down" size={18} color={colors.mutedForeground} />
           </TouchableOpacity>
@@ -271,15 +277,42 @@ export default function SendScreen() {
           <View style={[styles.modalSheet, { backgroundColor: colors.card }]}>
             <View style={styles.modalHandle} />
             <Text style={[styles.modalTitle, { color: colors.foreground }]}>Select Provider</Text>
-            <ScrollView>
-              {banks.map(b => (
-                <TouchableOpacity key={b.code} style={[styles.bankRow, { borderBottomColor: colors.border }]} onPress={() => handleBankSelect(b.code)} activeOpacity={0.7}>
-                  <Text style={[styles.bankRowName, { color: colors.foreground }]}>{b.name}</Text>
-                  {selectedBank === b.code && <Feather name="check" size={18} color={colors.primary} />}
+
+            {/* Search bar */}
+            <View style={[styles.searchRow, { backgroundColor: colors.input, borderColor: colors.border }]}>
+              <Feather name="search" size={16} color={colors.mutedForeground} />
+              <TextInput
+                style={[styles.searchInput, { color: colors.foreground }]}
+                value={bankSearch}
+                onChangeText={setBankSearch}
+                placeholder="Search banks…"
+                placeholderTextColor={colors.mutedForeground}
+                autoCorrect={false}
+                autoCapitalize="none"
+                clearButtonMode="while-editing"
+              />
+              {bankSearch.length > 0 && (
+                <TouchableOpacity onPress={() => setBankSearch('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                  <Feather name="x" size={14} color={colors.mutedForeground} />
                 </TouchableOpacity>
-              ))}
+              )}
+            </View>
+
+            <ScrollView keyboardShouldPersistTaps="handled">
+              {filteredBanks.length === 0 ? (
+                <Text style={[styles.emptySearch, { color: colors.mutedForeground }]}>
+                  {banksLoading ? 'Loading…' : `No results for "${bankSearch}"`}
+                </Text>
+              ) : (
+                filteredBanks.map(b => (
+                  <TouchableOpacity key={b.code} style={[styles.bankRow, { borderBottomColor: colors.border }]} onPress={() => handleBankSelect(b.code)} activeOpacity={0.7}>
+                    <Text style={[styles.bankRowName, { color: colors.foreground }]}>{b.name}</Text>
+                    {selectedBank === b.code && <Feather name="check" size={18} color={colors.primary} />}
+                  </TouchableOpacity>
+                ))
+              )}
             </ScrollView>
-            <TouchableOpacity style={[styles.cancelBtn, { borderColor: colors.border }]} onPress={() => setShowBankPicker(false)}>
+            <TouchableOpacity style={[styles.cancelBtn, { borderColor: colors.border }]} onPress={() => { setShowBankPicker(false); setBankSearch(''); }}>
               <Text style={[styles.cancelBtnText, { color: colors.foreground }]}>Cancel</Text>
             </TouchableOpacity>
           </View>
@@ -340,9 +373,12 @@ const styles = StyleSheet.create({
   sendBtnText: { fontFamily: 'Inter_600SemiBold', fontSize: 16 },
   sandboxNote: { fontFamily: 'Inter_400Regular', fontSize: 11, textAlign: 'center', marginTop: 12 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  modalSheet: { borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, maxHeight: '80%' },
+  modalSheet: { borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, maxHeight: '85%' },
   modalHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#E5E7EB', alignSelf: 'center', marginBottom: 20 },
-  modalTitle: { fontFamily: 'Inter_700Bold', fontSize: 18, marginBottom: 16 },
+  modalTitle: { fontFamily: 'Inter_700Bold', fontSize: 18, marginBottom: 12 },
+  searchRow: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, marginBottom: 12, gap: 8 },
+  searchInput: { flex: 1, paddingVertical: 11, fontFamily: 'Inter_400Regular', fontSize: 15 },
+  emptySearch: { fontFamily: 'Inter_400Regular', fontSize: 14, textAlign: 'center', paddingVertical: 32 },
   bankRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 16, borderBottomWidth: 1 },
   bankRowName: { fontFamily: 'Inter_400Regular', fontSize: 15 },
   cancelBtn: { borderWidth: 1, borderRadius: 12, padding: 15, alignItems: 'center', marginTop: 16 },
