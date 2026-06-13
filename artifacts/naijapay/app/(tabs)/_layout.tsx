@@ -20,13 +20,18 @@ export default function TabLayout() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.mutedForeground,
         headerShown: false,
+        tabBarLabelStyle: {
+          fontFamily: "Inter_500Medium",
+          fontSize: 11,
+          marginBottom: isWeb ? 0 : 2,
+        },
         tabBarStyle: {
           position: "absolute",
           backgroundColor: isIOS ? "transparent" : colors.background,
-          borderTopWidth: isWeb ? 1 : 0,
+          borderTopWidth: 1,
           borderTopColor: colors.border,
           elevation: 0,
-          ...(isWeb ? { height: 84 } : {}),
+          height: isWeb ? 84 : 72,
         },
         tabBarBackground: () =>
           isIOS ? (
@@ -35,76 +40,106 @@ export default function TabLayout() {
               tint={isDark ? "dark" : "light"}
               style={StyleSheet.absoluteFill}
             />
-          ) : isWeb ? (
+          ) : (
             <View
               style={[
                 StyleSheet.absoluteFill,
                 { backgroundColor: colors.background },
               ]}
             />
-          ) : null,
+          ),
       }}
     >
+      {/* ── Visible tabs ────────────────────────── */}
       <Tabs.Screen
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color }) =>
+          tabBarIcon: ({ color, focused }) =>
             isIOS ? (
-              <SymbolView name="house" tintColor={color} size={24} />
+              <SymbolView
+                name={focused ? "house.fill" : "house"}
+                tintColor={color}
+                size={24}
+              />
             ) : (
               <Feather name="home" size={22} color={color} />
             ),
         }}
       />
+
       <Tabs.Screen
-        name="send"
+        name="rewards"
         options={{
-          title: "Send",
-          tabBarIcon: ({ color }) =>
+          title: "Rewards",
+          tabBarIcon: ({ color, focused }) =>
             isIOS ? (
-              <SymbolView name="paperplane" tintColor={color} size={24} />
+              <SymbolView
+                name={focused ? "star.fill" : "star"}
+                tintColor={color}
+                size={24}
+              />
             ) : (
-              <Feather name="send" size={22} color={color} />
+              <Feather name="star" size={22} color={color} />
             ),
         }}
       />
+
       <Tabs.Screen
-        name="pay"
+        name="finance"
         options={{
-          title: "Pay",
-          tabBarIcon: ({ color }) =>
+          title: "Finance",
+          tabBarIcon: ({ color, focused }) =>
             isIOS ? (
-              <SymbolView name="creditcard" tintColor={color} size={24} />
+              <SymbolView
+                name={focused ? "chart.line.uptrend.xyaxis" : "chart.line.uptrend.xyaxis"}
+                tintColor={color}
+                size={24}
+              />
+            ) : (
+              <Feather name="trending-up" size={22} color={color} />
+            ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="cards"
+        options={{
+          title: "Cards",
+          tabBarIcon: ({ color, focused }) =>
+            isIOS ? (
+              <SymbolView
+                name={focused ? "creditcard.fill" : "creditcard"}
+                tintColor={color}
+                size={24}
+              />
             ) : (
               <Feather name="credit-card" size={22} color={color} />
             ),
         }}
       />
-      <Tabs.Screen
-        name="history"
-        options={{
-          title: "History",
-          tabBarIcon: ({ color }) =>
-            isIOS ? (
-              <SymbolView name="clock" tintColor={color} size={24} />
-            ) : (
-              <Feather name="clock" size={22} color={color} />
-            ),
-        }}
-      />
+
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Profile",
-          tabBarIcon: ({ color }) =>
+          title: "Me",
+          tabBarIcon: ({ color, focused }) =>
             isIOS ? (
-              <SymbolView name="person" tintColor={color} size={24} />
+              <SymbolView
+                name={focused ? "person.fill" : "person"}
+                tintColor={color}
+                size={24}
+              />
             ) : (
               <Feather name="user" size={22} color={color} />
             ),
         }}
       />
+
+      {/* ── Hidden screens (still navigable via router.push) ── */}
+      <Tabs.Screen name="send"    options={{ href: null }} />
+      <Tabs.Screen name="pay"     options={{ href: null }} />
+      <Tabs.Screen name="history" options={{ href: null }} />
     </Tabs>
   );
 }
