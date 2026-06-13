@@ -169,18 +169,18 @@ export default function ReceiptScreen() {
 
             {/* Top gradient band */}
             <LinearGradient
-              colors={['#00A859', '#007A41']}
+              colors={['#0A1E4D', '#2563EB']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.cardBrand}
             >
               <View style={styles.brandRow}>
                 <View style={styles.brandLogo}>
-                  <Text style={styles.brandLogoText}>Z</Text>
+                  <Text style={styles.brandLogoText}>G</Text>
                 </View>
                 <View>
-                  <Text style={styles.brandName}>Zela</Text>
-                  <Text style={styles.brandSub}>Microfinance Bank</Text>
+                  <Text style={styles.brandName}>Guudees</Text>
+                  <Text style={styles.brandSub}>Good Money. Good Life.</Text>
                 </View>
               </View>
               <Text style={styles.brandReceipt}>Payment Receipt</Text>
@@ -235,7 +235,7 @@ export default function ReceiptScreen() {
                 { label: 'Time', value: fmtTime(tx.date) },
                 { label: 'Reference', value: tx.reference, mono: true },
                 { label: 'Account', value: user?.accountNumber ?? '—' },
-                { label: 'Bank', value: user?.bankName ?? 'Zela MFB' },
+                { label: 'Bank', value: user?.bankName ?? 'Guudees MFB' },
               ].map((row, i) => (
                 <View key={i} style={[styles.detailRow, i > 0 && { borderTopWidth: 1, borderTopColor: colors.border }]}>
                   <Text style={[styles.detailLabel, { color: colors.mutedForeground }]}>{row.label}</Text>
@@ -253,7 +253,7 @@ export default function ReceiptScreen() {
             {/* Footer */}
             <View style={[styles.cardFooter, { borderTopColor: colors.border }]}>
               <Text style={[styles.footerText, { color: colors.mutedForeground }]}>
-                Issued by Zela Microfinance Bank • CBN Licensed
+                Issued by Guudees MFB • CBN Licensed
               </Text>
               <Text style={[styles.footerText, { color: colors.mutedForeground }]}>
                 Generated {fmtDate(new Date().toISOString())} at {fmtTime(new Date().toISOString())}

@@ -237,7 +237,7 @@ export default function KYCScreen() {
           {/* ─── INTRO ─── */}
           {step === 'intro' && (
             <View style={styles.stepContainer}>
-              <LinearGradient colors={['#00A85915', '#00A85905']} style={styles.introBanner}>
+              <LinearGradient colors={['#2563EB15', '#2563EB05']} style={styles.introBanner}>
                 <View style={[styles.shieldIcon, { backgroundColor: colors.primary }]}>
                   <Feather name="shield" size={36} color="#fff" />
                 </View>
@@ -436,9 +436,9 @@ export default function KYCScreen() {
           {/* ─── SUCCESS ─── */}
           {step === 'success' && (
             <View style={[styles.stepContainer, styles.centeredStep]}>
-              <LinearGradient colors={['#00A85920', '#00A85905']} style={styles.successBanner}>
-                <View style={[styles.successRing, { borderColor: '#00A859' }]}>
-                  <Feather name="check" size={48} color="#00A859" />
+              <LinearGradient colors={['#2563EB20', '#2563EB05']} style={styles.successBanner}>
+                <View style={[styles.successRing, { borderColor: '#2563EB' }]}>
+                  <Feather name="check" size={48} color="#2563EB" />
                 </View>
               </LinearGradient>
 

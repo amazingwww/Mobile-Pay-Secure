@@ -13,7 +13,7 @@ export type SavingsGoal = {
 };
 
 export const GOAL_COLORS = [
-  '#00A859', '#4F46E5', '#0284C7', '#D97706',
+  '#2563EB', '#4F46E5', '#0284C7', '#D97706',
   '#DC2626', '#7C3AED', '#0891B2', '#059669',
 ];
 
@@ -31,7 +31,7 @@ type SavingsContextType = {
 
 const SavingsContext = createContext<SavingsContextType | undefined>(undefined);
 
-const STORAGE_KEY = '@zela_savings_goals';
+const STORAGE_KEY = '@guudees_savings_goals';
 
 function genId() {
   return Date.now().toString() + Math.random().toString(36).substr(2, 6);
@@ -44,7 +44,7 @@ const DEMO_GOALS: SavingsGoal[] = [
     emoji: '🏦',
     targetAmount: 500000,
     savedAmount: 120000,
-    color: '#00A859',
+    color: '#2563EB',
     createdAt: new Date(Date.now() - 30 * 86400000).toISOString(),
   },
   {

@@ -39,14 +39,22 @@ export default function HistoryScreen() {
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={[styles.header, { paddingTop: topPad + 16 }]}>
         <Text style={[styles.title, { color: colors.foreground }]}>Transactions</Text>
-        <TouchableOpacity
-          style={[styles.analyticsBtn, { backgroundColor: colors.card }]}
-          onPress={() => router.push('/analytics')}
-          activeOpacity={0.75}
-        >
-          <Feather name="bar-chart-2" size={18} color={colors.primary} />
-          <Text style={[styles.analyticsBtnText, { color: colors.primary }]}>Analytics</Text>
-        </TouchableOpacity>
+        <View style={styles.headerBtns}>
+          <TouchableOpacity
+            style={[styles.analyticsBtn, { backgroundColor: colors.card }]}
+            onPress={() => router.push('/scheduled')}
+            activeOpacity={0.75}
+          >
+            <Feather name="repeat" size={16} color={colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.analyticsBtn, { backgroundColor: colors.card }]}
+            onPress={() => router.push('/analytics')}
+            activeOpacity={0.75}
+          >
+            <Feather name="bar-chart-2" size={16} color={colors.primary} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Summary Cards */}
@@ -140,6 +148,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_700Bold',
     fontSize: 24,
     letterSpacing: -0.3,
+  },
+  headerBtns: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   analyticsBtn: {
     flexDirection: 'row',

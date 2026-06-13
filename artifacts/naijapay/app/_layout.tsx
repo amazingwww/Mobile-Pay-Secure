@@ -15,6 +15,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/context/AuthContext";
 import { SavingsProvider } from "@/context/SavingsContext";
+import { ScheduledProvider } from "@/context/ScheduledContext";
 import { WalletProvider } from "@/context/WalletContext";
 import { setupNotificationChannel } from "@/lib/notifications";
 
@@ -36,6 +37,7 @@ function RootLayoutNav() {
       <Stack.Screen name="receipt" options={{ headerShown: false }} />
       <Stack.Screen name="savings" options={{ headerShown: false }} />
       <Stack.Screen name="analytics" options={{ headerShown: false }} />
+      <Stack.Screen name="scheduled" options={{ headerShown: false }} />
     </Stack>
   );
 }
@@ -67,9 +69,11 @@ export default function RootLayout() {
           <AuthProvider>
             <WalletProvider>
               <SavingsProvider>
-                <GestureHandlerRootView style={{ flex: 1 }}>
-                  <RootLayoutNav />
-                </GestureHandlerRootView>
+                <ScheduledProvider>
+                  <GestureHandlerRootView style={{ flex: 1 }}>
+                    <RootLayoutNav />
+                  </GestureHandlerRootView>
+                </ScheduledProvider>
               </SavingsProvider>
             </WalletProvider>
           </AuthProvider>

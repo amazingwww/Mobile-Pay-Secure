@@ -27,7 +27,7 @@ const FALLBACK_BANKS = [
   { name: 'Fidelity Bank', code: '070' },
   { name: 'Sterling Bank', code: '232' },
   { name: 'Kuda Bank', code: '090267' },
-  { name: 'Zela MFB', code: '090xxx' },
+  { name: 'Guudees MFB', code: '090xxx' },
   { name: 'Opay', code: '304' },
   { name: 'Palmpay', code: '999991' },
   { name: 'Moniepoint', code: '50515' },

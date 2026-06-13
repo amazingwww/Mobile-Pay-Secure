@@ -142,7 +142,7 @@ export default function SavingsScreen() {
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       {/* Header */}
       <LinearGradient
-        colors={['#00A859', '#007A41']}
+        colors={['#0A1E4D', '#2563EB']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={[styles.headerGrad, { paddingTop: topPad + 12 }]}
@@ -193,7 +193,7 @@ export default function SavingsScreen() {
         activeOpacity={0.85}
       >
         <LinearGradient
-          colors={['#00C46C', '#00A859']}
+          colors={['#1E3A8A', '#2563EB']}
           style={styles.fabGrad}
         >
           <Feather name="plus" size={26} color="#fff" />
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
   emptyTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 18 },
   emptySub: { fontFamily: 'Inter_400Regular', fontSize: 14, textAlign: 'center', lineHeight: 20 },
 
-  fab: { position: 'absolute', right: 20, shadowColor: '#00A859', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.45, shadowRadius: 12, elevation: 8 },
+  fab: { position: 'absolute', right: 20, shadowColor: '#2563EB', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.45, shadowRadius: 12, elevation: 8 },
   fabGrad: { width: 60, height: 60, borderRadius: 30, alignItems: 'center', justifyContent: 'center' },
 
   modalRoot: { flex: 1 },

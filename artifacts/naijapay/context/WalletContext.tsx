@@ -60,14 +60,14 @@ function genId() {
 }
 
 const MOCK_TRANSACTIONS: Transaction[] = [
-  { id: '1', type: 'credit', amount: 250000, description: 'Salary - June 2026', party: 'XYZ Technologies Ltd', date: new Date(Date.now() - 1 * 86400000).toISOString(), status: 'success', category: 'deposit', reference: 'ZL20260610001' },
-  { id: '2', type: 'debit', amount: 5000, description: 'MTN Airtime Recharge', party: 'MTN Nigeria', date: new Date(Date.now() - 2 * 86400000).toISOString(), status: 'success', category: 'airtime', reference: 'ZL20260609001' },
-  { id: '3', type: 'debit', amount: 25000, description: 'Transfer to Chukwuemeka Nwosu', party: 'Chukwuemeka Nwosu', date: new Date(Date.now() - 3 * 86400000).toISOString(), status: 'success', category: 'transfer', reference: 'ZL20260608001' },
-  { id: '4', type: 'debit', amount: 14500, description: 'PHCN Electricity', party: 'Ikeja Electric', date: new Date(Date.now() - 5 * 86400000).toISOString(), status: 'success', category: 'bill', reference: 'ZL20260606001' },
-  { id: '5', type: 'credit', amount: 50000, description: 'Transfer from Fatimah Abubakar', party: 'Fatimah Abubakar', date: new Date(Date.now() - 7 * 86400000).toISOString(), status: 'success', category: 'transfer', reference: 'ZL20260604001' },
-  { id: '6', type: 'debit', amount: 9900, description: 'DSTV Subscription - Compact', party: 'DSTV Nigeria', date: new Date(Date.now() - 10 * 86400000).toISOString(), status: 'success', category: 'bill', reference: 'ZL20260601001' },
-  { id: '7', type: 'debit', amount: 1200, description: 'Airtel Data - 1GB', party: 'Airtel Nigeria', date: new Date(Date.now() - 12 * 86400000).toISOString(), status: 'success', category: 'data', reference: 'ZL20260530001' },
-  { id: '8', type: 'credit', amount: 10000, description: 'Transfer from Olumide Badmus', party: 'Olumide Badmus', date: new Date(Date.now() - 15 * 86400000).toISOString(), status: 'success', category: 'transfer', reference: 'ZL20260527001' },
+  { id: '1', type: 'credit', amount: 250000, description: 'Salary - June 2026', party: 'XYZ Technologies Ltd', date: new Date(Date.now() - 1 * 86400000).toISOString(), status: 'success', category: 'deposit', reference: 'GD20260610001' },
+  { id: '2', type: 'debit', amount: 5000, description: 'MTN Airtime Recharge', party: 'MTN Nigeria', date: new Date(Date.now() - 2 * 86400000).toISOString(), status: 'success', category: 'airtime', reference: 'GD20260609001' },
+  { id: '3', type: 'debit', amount: 25000, description: 'Transfer to Chukwuemeka Nwosu', party: 'Chukwuemeka Nwosu', date: new Date(Date.now() - 3 * 86400000).toISOString(), status: 'success', category: 'transfer', reference: 'GD20260608001' },
+  { id: '4', type: 'debit', amount: 14500, description: 'PHCN Electricity', party: 'Ikeja Electric', date: new Date(Date.now() - 5 * 86400000).toISOString(), status: 'success', category: 'bill', reference: 'GD20260606001' },
+  { id: '5', type: 'credit', amount: 50000, description: 'Transfer from Fatimah Abubakar', party: 'Fatimah Abubakar', date: new Date(Date.now() - 7 * 86400000).toISOString(), status: 'success', category: 'transfer', reference: 'GD20260604001' },
+  { id: '6', type: 'debit', amount: 9900, description: 'DSTV Subscription - Compact', party: 'DSTV Nigeria', date: new Date(Date.now() - 10 * 86400000).toISOString(), status: 'success', category: 'bill', reference: 'GD20260601001' },
+  { id: '7', type: 'debit', amount: 1200, description: 'Airtel Data - 1GB', party: 'Airtel Nigeria', date: new Date(Date.now() - 12 * 86400000).toISOString(), status: 'success', category: 'data', reference: 'GD20260530001' },
+  { id: '8', type: 'credit', amount: 10000, description: 'Transfer from Olumide Badmus', party: 'Olumide Badmus', date: new Date(Date.now() - 15 * 86400000).toISOString(), status: 'success', category: 'transfer', reference: 'GD20260527001' },
 ];
 
 const INITIAL_BENEFICIARIES: Beneficiary[] = [
@@ -88,14 +88,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   const loadBeneficiaries = async () => {
     try {
-      const stored = await AsyncStorage.getItem('@zela_beneficiaries');
+      const stored = await AsyncStorage.getItem('@guudees_beneficiaries');
       if (stored) setBeneficiaries(JSON.parse(stored));
     } catch {}
   };
 
   const saveBeneficiaries = async (list: Beneficiary[]) => {
     try {
-      await AsyncStorage.setItem('@zela_beneficiaries', JSON.stringify(list));
+      await AsyncStorage.setItem('@guudees_beneficiaries', JSON.stringify(list));
     } catch {}
   };
 
@@ -169,7 +169,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     if (!apiReady) {
       if (params.amount > balance) return { ok: false, error: 'Insufficient balance' };
       setBalance(b => b - params.amount);
-      const ref = 'ZL' + genId().toUpperCase();
+      const ref = 'GD' + genId().toUpperCase();
       const tx: Transaction = {
         id: genId(), type: 'debit', amount: params.amount,
         description: params.narration || `Transfer to ${displayName}`,
@@ -199,14 +199,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     if (!apiReady) {
       if (amount > balance) return false;
       setBalance(b => b - amount);
-      addTx({ id: genId(), type: 'debit', amount, description: `${network} Airtime - ${phone}`, party: `${network} Nigeria`, date: new Date().toISOString(), status: 'success', category: 'airtime', reference: 'ZL' + genId().toUpperCase() });
+      addTx({ id: genId(), type: 'debit', amount, description: `${network} Airtime - ${phone}`, party: `${network} Nigeria`, date: new Date().toISOString(), status: 'success', category: 'airtime', reference: 'GD' + genId().toUpperCase() });
       notifyAirtimeSent(amount, phone, network);
       return true;
     }
     try {
       await api.buyAirtime({ network, phone, amount });
       setBalance(b => b - amount);
-      addTx({ id: genId(), type: 'debit', amount, description: `${network} Airtime - ${phone}`, party: `${network} Nigeria`, date: new Date().toISOString(), status: 'success', category: 'airtime', reference: 'ZL' + genId().toUpperCase() });
+      addTx({ id: genId(), type: 'debit', amount, description: `${network} Airtime - ${phone}`, party: `${network} Nigeria`, date: new Date().toISOString(), status: 'success', category: 'airtime', reference: 'GD' + genId().toUpperCase() });
       notifyAirtimeSent(amount, phone, network);
       return true;
     } catch { return false; }
@@ -216,14 +216,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     if (!apiReady) {
       if (amount > balance) return false;
       setBalance(b => b - amount);
-      addTx({ id: genId(), type: 'debit', amount, description: `${network} Data - ${planCode}`, party: `${network} Nigeria`, date: new Date().toISOString(), status: 'success', category: 'data', reference: 'ZL' + genId().toUpperCase() });
+      addTx({ id: genId(), type: 'debit', amount, description: `${network} Data - ${planCode}`, party: `${network} Nigeria`, date: new Date().toISOString(), status: 'success', category: 'data', reference: 'GD' + genId().toUpperCase() });
       notifyDataPurchased(planCode, phone, network);
       return true;
     }
     try {
       await api.buyData({ network, phone, planCode, amount });
       setBalance(b => b - amount);
-      addTx({ id: genId(), type: 'debit', amount, description: `${network} Data - ${planCode}`, party: `${network} Nigeria`, date: new Date().toISOString(), status: 'success', category: 'data', reference: 'ZL' + genId().toUpperCase() });
+      addTx({ id: genId(), type: 'debit', amount, description: `${network} Data - ${planCode}`, party: `${network} Nigeria`, date: new Date().toISOString(), status: 'success', category: 'data', reference: 'GD' + genId().toUpperCase() });
       notifyDataPurchased(planCode, phone, network);
       return true;
     } catch { return false; }
@@ -233,7 +233,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     if (!apiReady) {
       if (amount > balance) return { ok: false, error: 'Insufficient balance' };
       setBalance(b => b - amount);
-      addTx({ id: genId(), type: 'debit', amount, description: `${type} - Ref: ${reference}`, party: type, date: new Date().toISOString(), status: 'success', category: 'bill', reference: 'ZL' + genId().toUpperCase() });
+      addTx({ id: genId(), type: 'debit', amount, description: `${type} - Ref: ${reference}`, party: type, date: new Date().toISOString(), status: 'success', category: 'bill', reference: 'GD' + genId().toUpperCase() });
       notifyBillPaid(type, amount);
       return { ok: true };
     }
@@ -265,10 +265,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     addTx({
       id: genId(), type: 'debit', amount,
       description: `Savings: ${goalName}`,
-      party: 'Zela Savings',
+      party: 'Guudees Savings',
       date: new Date().toISOString(),
       status: 'success', category: 'transfer',
-      reference: 'ZL' + genId().toUpperCase(),
+      reference: 'GD' + genId().toUpperCase(),
     });
     return { ok: true };
   };
@@ -278,10 +278,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     addTx({
       id: genId(), type: 'credit', amount,
       description: `Withdrawal: ${goalName}`,
-      party: 'Zela Savings',
+      party: 'Guudees Savings',
       date: new Date().toISOString(),
       status: 'success', category: 'deposit',
-      reference: 'ZL' + genId().toUpperCase(),
+      reference: 'GD' + genId().toUpperCase(),
     });
   };
 

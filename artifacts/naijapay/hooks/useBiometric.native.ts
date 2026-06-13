@@ -3,7 +3,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 
-const BIOMETRIC_PREF_KEY = '@zela_biometric_enabled';
+const BIOMETRIC_PREF_KEY = '@guudees_biometric_enabled';
 
 export type BiometricType = 'fingerprint' | 'face' | 'iris' | 'none';
 
@@ -58,7 +58,7 @@ export function useBiometric() {
     if (!isSupported || !isEnrolled) return false;
     try {
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Log in to Zela',
+        promptMessage: 'Log in to Guudees',
         cancelLabel: 'Use PIN instead',
         disableDeviceFallback: false,
         fallbackLabel: 'Use PIN',

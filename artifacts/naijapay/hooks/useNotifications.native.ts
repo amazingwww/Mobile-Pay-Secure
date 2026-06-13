@@ -7,7 +7,7 @@ import {
   setupNotificationChannel,
 } from '@/lib/notifications';
 
-const NOTIF_PREF_KEY = '@zela_notifications_enabled';
+const NOTIF_PREF_KEY = '@guudees_notifications_enabled';
 
 export function useNotifications() {
   const [hasPermission, setHasPermission] = useState(false);

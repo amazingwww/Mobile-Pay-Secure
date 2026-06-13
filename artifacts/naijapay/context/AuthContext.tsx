@@ -27,9 +27,9 @@ const DEFAULT_USER: User = {
   name: 'Adebayo Okonkwo',
   accountNumber: '0123456789',
   accountName: 'ADEBAYO OKONKWO',
-  bankName: 'Zela Microfinance Bank',
+  bankName: 'Guudees MFB',
   phone: '+234 801 234 5678',
-  email: 'adebayo@zela.ng',
+  email: 'adebayo@guudees.ng',
   bvn: '22*******12',
   pin: '1234',
   tier: 'Tier 1',
@@ -48,12 +48,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const initUser = async () => {
     try {
-      const stored = await AsyncStorage.getItem('@zela_user');
+      const stored = await AsyncStorage.getItem('@guudees_user');
       if (stored) {
-        setUser(JSON.parse(stored));
+        const parsed = JSON.parse(stored) as User;
+        // Migrate old bank name if needed
+        if (parsed.bankName === 'Zela Microfinance Bank') {
+          parsed.bankName = 'Guudees MFB';
+        }
+        setUser(parsed);
       } else {
-        await AsyncStorage.setItem('@zela_user', JSON.stringify(DEFAULT_USER));
-        setUser(DEFAULT_USER);
+        // Try legacy key
+        const legacy = await AsyncStorage.getItem('@zela_user');
+        if (legacy) {
+          const parsed = JSON.parse(legacy) as User;
+          parsed.bankName = 'Guudees MFB';
+          await AsyncStorage.setItem('@guudees_user', JSON.stringify(parsed));
+          setUser(parsed);
+        } else {
+          await AsyncStorage.setItem('@guudees_user', JSON.stringify(DEFAULT_USER));
+          setUser(DEFAULT_USER);
+        }
       }
     } catch {
       setUser(DEFAULT_USER);
@@ -76,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updatePin = async (oldPin: string, newPin: string): Promise<boolean> => {
     if (!user || oldPin !== user.pin) return false;
     const updated = { ...user, pin: newPin };
-    await AsyncStorage.setItem('@zela_user', JSON.stringify(updated));
+    await AsyncStorage.setItem('@guudees_user', JSON.stringify(updated));
     setUser(updated);
     return true;
   };
@@ -84,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateUser = async (updates: Partial<User>) => {
     if (!user) return;
     const updated = { ...user, ...updates };
-    await AsyncStorage.setItem('@zela_user', JSON.stringify(updated));
+    await AsyncStorage.setItem('@guudees_user', JSON.stringify(updated));
     setUser(updated);
   };
 

@@ -41,7 +41,7 @@ export default function ProfileScreen() {
   const handleLogout = () => {
     Alert.alert(
       'Log Out',
-      'Are you sure you want to log out of Zela?',
+      'Are you sure you want to log out of Guudees?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -108,7 +108,7 @@ export default function ProfileScreen() {
     if (val && !result) {
       Alert.alert(
         'Permission denied',
-        'Please enable notifications for Zela in your device Settings to receive alerts.'
+        'Please enable notifications for Guudees in your device Settings to receive alerts.'
       );
     }
   };
@@ -281,7 +281,7 @@ export default function ProfileScreen() {
               {
                 icon: 'help-circle',
                 label: 'Help Center',
-                onPress: () => Alert.alert('Help Center', 'For support, call 0800-ZELA or email support@zela.ng'),
+                onPress: () => Alert.alert('Help Center', 'For support, call 0800-GUUDEES or email support@guudees.ng'),
               },
               {
                 icon: 'message-square',
@@ -321,7 +321,7 @@ export default function ProfileScreen() {
         </View>
 
         <Text style={[styles.version, { color: colors.mutedForeground }]}>
-          Zela v1.0.0 {'\u2022'} CBN Licensed
+          Guudees v1.0.0 {'\u2022'} CBN Licensed
         </Text>
       </ScrollView>
     </View>
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
-    shadowColor: '#00A859',
+    shadowColor: '#2563EB',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 12,

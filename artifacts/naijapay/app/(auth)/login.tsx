@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
+  Image,
   Platform,
   StyleSheet,
   Text,
@@ -107,11 +108,12 @@ export default function LoginScreen() {
   return (
     <View style={[styles.root, { backgroundColor: colors.background, paddingTop: topPad, paddingBottom: bottomPad + 16 }]}>
       <View style={styles.logoSection}>
-        <View style={[styles.logoCircle, { backgroundColor: colors.primary }]}>
-          <Text style={styles.logoLetter}>Z</Text>
-        </View>
-        <Text style={[styles.appName, { color: colors.foreground }]}>Zela</Text>
-        <Text style={[styles.tagline, { color: colors.mutedForeground }]}>Microfinance Bank</Text>
+        <Image
+          source={require('@/assets/images/guudees-logo.png')}
+          style={styles.logoImg}
+          resizeMode="contain"
+        />
+        <Text style={[styles.tagline, { color: colors.mutedForeground }]}>Good Money. Good Life.</Text>
       </View>
 
       <View style={styles.greetSection}>
@@ -184,27 +186,9 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingTop: 24,
   },
-  logoCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#00A859',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  logoLetter: {
-    color: '#fff',
-    fontFamily: 'Inter_700Bold',
-    fontSize: 32,
-  },
-  appName: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 26,
-    letterSpacing: -0.5,
+  logoImg: {
+    width: 200,
+    height: 100,
   },
   tagline: {
     fontFamily: 'Inter_400Regular',

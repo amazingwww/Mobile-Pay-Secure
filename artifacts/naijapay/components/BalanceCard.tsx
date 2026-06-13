@@ -1,7 +1,7 @@
 import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 type Props = {
   balance: number;
@@ -21,20 +21,28 @@ export function BalanceCard({ balance, accountNumber, accountName, bankName }: P
 
   return (
     <LinearGradient
-      colors={['#007A3D', '#00A859', '#00C96B']}
+      colors={['#0A1E4D', '#1E3A8A', '#2563EB']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.card}
     >
+      {/* dot pattern overlay */}
+      <View style={styles.dotPattern} pointerEvents="none">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <View key={i} style={styles.dot} />
+        ))}
+      </View>
+
       <View style={styles.topRow}>
         <View style={styles.logoRow}>
-          <View style={styles.logoCircle}>
-            <Text style={styles.logoLetter}>Z</Text>
-          </View>
-          <Text style={styles.bankName}>{bankName}</Text>
+          <Image
+            source={require('@/assets/images/guudees-logo.png')}
+            style={styles.logoImg}
+            resizeMode="contain"
+          />
         </View>
         <View style={styles.chipIcon}>
-          <Feather name="wifi" size={18} color="rgba(255,255,255,0.6)" />
+          <Feather name="wifi" size={18} color="rgba(255,255,255,0.5)" />
         </View>
       </View>
 
@@ -67,13 +75,30 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 22,
     marginHorizontal: 16,
-    height: 190,
+    height: 200,
     justifyContent: 'space-between',
-    shadowColor: '#007A3D',
+    shadowColor: '#0A1E4D',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.35,
     shadowRadius: 16,
     elevation: 10,
+    overflow: 'hidden',
+  },
+  dotPattern: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    width: 60,
+    gap: 6,
+    opacity: 0.15,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#F2B705',
   },
   topRow: {
     flexDirection: 'row',
@@ -83,32 +108,14 @@ const styles = StyleSheet.create({
   logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
-  logoCircle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  logoImg: {
+    width: 100,
+    height: 32,
+    tintColor: '#fff',
   },
-  logoLetter: {
-    color: '#fff',
-    fontFamily: 'Inter_700Bold',
-    fontSize: 16,
-  },
-  bankName: {
-    color: 'rgba(255,255,255,0.9)',
-    fontFamily: 'Inter_500Medium',
-    fontSize: 12,
-  },
-  chipIcon: {
-    opacity: 0.7,
-  },
-  balanceSection: {
-    alignItems: 'flex-start',
-  },
+  chipIcon: { opacity: 0.7 },
+  balanceSection: { alignItems: 'flex-start' },
   balanceLabel: {
     color: 'rgba(255,255,255,0.7)',
     fontFamily: 'Inter_400Regular',
