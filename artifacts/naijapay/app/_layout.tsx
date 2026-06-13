@@ -35,6 +35,7 @@ function RootLayoutNav() {
       <Stack.Screen name="kyc" options={{ headerShown: false }} />
       <Stack.Screen name="receipt" options={{ headerShown: false }} />
       <Stack.Screen name="savings" options={{ headerShown: false }} />
+      <Stack.Screen name="analytics" options={{ headerShown: false }} />
     </Stack>
   );
 }

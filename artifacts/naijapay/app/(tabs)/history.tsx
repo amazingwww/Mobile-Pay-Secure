@@ -39,6 +39,14 @@ export default function HistoryScreen() {
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={[styles.header, { paddingTop: topPad + 16 }]}>
         <Text style={[styles.title, { color: colors.foreground }]}>Transactions</Text>
+        <TouchableOpacity
+          style={[styles.analyticsBtn, { backgroundColor: colors.card }]}
+          onPress={() => router.push('/analytics')}
+          activeOpacity={0.75}
+        >
+          <Feather name="bar-chart-2" size={18} color={colors.primary} />
+          <Text style={[styles.analyticsBtnText, { color: colors.primary }]}>Analytics</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Summary Cards */}
@@ -124,11 +132,26 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 20,
     paddingBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   title: {
     fontFamily: 'Inter_700Bold',
     fontSize: 24,
     letterSpacing: -0.3,
+  },
+  analyticsBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  analyticsBtnText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
   },
   summaryRow: {
     flexDirection: 'row',
